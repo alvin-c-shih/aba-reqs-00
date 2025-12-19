@@ -1,0 +1,380 @@
+# Trial Recording Screen - Machine-Readable Specification
+
+screen_id: rbt_trial_recording
+name: Trial Recording (Discrete Trial Training)
+route: /sessions/{session_id}/programs/{program_id}/trials
+platform: mobile
+roles: [rbt]
+
+description: |
+  Real-time data collection interface for discrete trial training. RBT presents
+  a stimulus (SD), student responds, RBT records outcome (correct/prompted/incorrect).
+  Must support rapid successive trials (<1 second between responses).
+
+states:
+  - state_id: ready
+    description: Ready to record next trial, showing current target
+    data_requirements:
+      - entity: session
+        fields: [id, student_id, start_time, elapsed_time]
+      - entity: program
+        fields: [id, name, targets, mastery_criteria]
+      - entity: current_target
+        fields: [id, sd_text, materials, prompt_hierarchy]
+      - entity: trial_history
+        fields: [responses_today, percent_correct, recent_trials]
+    ui_elements:
+      - id: session_timer
+        type: timer
+        source: session.elapsed_time
+        position: header
+        format: "MM:SS"
+      - id: program_name
+        type: text
+        source: program.name
+        style: heading
+      - id: target_display
+        type: card
+        children:
+          - id: sd_text
+            type: text_large
+            source: current_target.sd_text
+          - id: materials
+            type: text
+            source: current_target.materials
+      - id: correct_button
+        type: button_large
+        label: "✓ CORRECT"
+        style: success
+        haptic: true
+        action: record_trial_correct
+        hotkey: "1"
+      - id: prompted_button
+        type: button_medium
+        label: "◐ PROMPTED"
+        style: warning
+        action: record_trial_prompted
+        hotkey: "2"
+      - id: incorrect_button
+        type: button_medium
+        label: "✗ INCORRECT"
+        style: error
+        action: record_trial_incorrect
+        hotkey: "3"
+      - id: trial_history_bar
+        type: visual_history
+        source: trial_history.recent_trials
+        max_items: 20
+        symbols:
+          correct: "✓"
+          prompted: "◐"
+          incorrect: "✗"
+      - id: session_stats
+        type: stats_summary
+        fields:
+          - label: "Today"
+            value: trial_history.responses_today
+          - label: "% Correct"
+            value: trial_history.percent_correct
+            format: percentage
+      - id: undo_button
+        type: button_secondary
+        label: "⎌ Undo Last"
+        enabled_when: trial_history.recent_trials.length > 0
+        action: undo_last_trial
+      - id: note_button
+        type: button_secondary
+        label: "+ Add Note"
+        action: show_note_dialog
+    actions:
+      - id: record_trial_correct
+        api_call:
+          method: POST
+          path: /api/v1/sessions/{session_id}/trials
+          body:
+            program_id: "{program_id}"
+            target_id: "{current_target.id}"
+            response: "correct"
+            timestamp: "{now}"
+        on_success:
+          - play_haptic: "success"
+          - update_state: trial_recorded
+          - transition_to: ready
+        on_error:
+          - queue_offline: true
+          - play_haptic: "error"
+          - show_toast: "Saved offline, will sync later"
+      - id: record_trial_prompted
+        api_call:
+          method: POST
+          path: /api/v1/sessions/{session_id}/trials
+          body:
+            program_id: "{program_id}"
+            target_id: "{current_target.id}"
+            response: "prompted"
+            timestamp: "{now}"
+        on_success:
+          - play_haptic: "light"
+          - transition_to: ready
+      - id: record_trial_incorrect
+        api_call:
+          method: POST
+          path: /api/v1/sessions/{session_id}/trials
+          body:
+            program_id: "{program_id}"
+            target_id: "{current_target.id}"
+            response: "incorrect"
+            timestamp: "{now}"
+        on_success:
+          - play_haptic: "error"
+          - transition_to: ready
+      - id: undo_last_trial
+        api_call:
+          method: DELETE
+          path: /api/v1/trials/{last_trial_id}
+        on_success:
+          - remove_from_history: last
+          - play_haptic: "selection"
+      - id: show_note_dialog
+        transition_to: note_entry
+
+  - state_id: note_entry
+    description: Adding a note to the current or previous trial
+    ui_elements:
+      - id: note_input
+        type: textarea
+        placeholder: "Add note about this trial..."
+      - id: voice_button
+        type: button
+        label: "🎤 Voice Input"
+        action: start_voice_input
+      - id: save_note
+        type: button
+        label: "Save"
+        action: save_trial_note
+      - id: cancel_note
+        type: button
+        label: "Cancel"
+        action: cancel_note_entry
+
+  - state_id: offline
+    description: No network connection, queuing data locally
+    ui_elements:
+      - id: offline_banner
+        type: alert
+        message: "⚠️ Offline - Data will sync when connected"
+        style: warning
+    behavior:
+      - queue_api_calls: true
+      - show_offline_indicator: true
+
+transitions:
+  - from: ready
+    to: ready
+    trigger: record_trial_*
+    duration_ms: 300
+  - from: ready
+    to: note_entry
+    trigger: show_note_dialog
+  - from: note_entry
+    to: ready
+    trigger: [save_trial_note, cancel_note_entry]
+  - from: ready
+    to: offline
+    trigger: network_disconnected
+  - from: offline
+    to: ready
+    trigger: network_reconnected
+
+api_endpoints:
+  - method: GET
+    path: /api/v1/sessions/{session_id}
+    response_schema:
+      type: object
+      properties:
+        id: string
+        student_id: string
+        start_time: datetime
+        elapsed_seconds: integer
+  
+  - method: GET
+    path: /api/v1/programs/{program_id}/current-target
+    query_params:
+      session_id: string
+    response_schema:
+      type: object
+      properties:
+        id: string
+        sd_text: string
+        materials: string
+        prompt_hierarchy: array
+  
+  - method: GET
+    path: /api/v1/sessions/{session_id}/trial-history
+    query_params:
+      program_id: string
+      limit: integer
+    response_schema:
+      type: object
+      properties:
+        recent_trials:
+          type: array
+          items:
+            type: object
+            properties:
+              id: string
+              response: enum [correct, prompted, incorrect]
+              timestamp: datetime
+        responses_today: integer
+        percent_correct: number
+  
+  - method: POST
+    path: /api/v1/sessions/{session_id}/trials
+    request_schema:
+      type: object
+      required: [program_id, target_id, response, timestamp]
+      properties:
+        program_id: string
+        target_id: string
+        response: enum [correct, prompted, incorrect]
+        prompt_level: string (optional)
+        notes: string (optional)
+        timestamp: datetime
+    response_schema:
+      type: object
+      properties:
+        id: string
+        created_at: datetime
+  
+  - method: DELETE
+    path: /api/v1/trials/{trial_id}
+    response_schema:
+      type: object
+      properties:
+        deleted: boolean
+
+performance_requirements:
+  - metric: tap_to_record_latency
+    target: < 100ms
+    description: Time from button tap to trial saved locally
+  
+  - metric: api_response_time
+    target: < 200ms
+    p95: true
+    description: Online mode API response
+  
+  - metric: offline_queue_capacity
+    target: 1000 trials
+    description: Maximum trials that can be queued offline
+  
+  - metric: ui_frame_rate
+    target: 60 fps
+    description: Smooth animations and transitions
+
+test_scenarios:
+  - scenario: record_correct_trial
+    id: TS-RT-001
+    given:
+      - user_role: rbt
+      - screen: trial_recording
+      - session: active
+      - network: online
+    when:
+      - tap_button: correct_button
+    then:
+      - api_called: POST /api/v1/sessions/{session_id}/trials
+      - api_body_contains: {response: "correct"}
+      - haptic_played: success
+      - element_updated: trial_history_bar
+      - element_updated: session_stats
+    
+  - scenario: rapid_successive_trials
+    id: TS-RT-002
+    given:
+      - user_role: rbt
+      - screen: trial_recording
+    when:
+      - tap_button: correct_button
+      - wait: 500ms
+      - tap_button: correct_button
+      - wait: 500ms
+      - tap_button: incorrect_button
+    then:
+      - api_call_count: 3
+      - trial_history_bar_shows: ["✓", "✓", "✗"]
+      - session_stats_correct: 2
+      - session_stats_incorrect: 1
+  
+  - scenario: undo_last_trial
+    id: TS-RT-003
+    given:
+      - user_role: rbt
+      - screen: trial_recording
+      - trial_history: ["✓", "✓", "✗"]
+    when:
+      - tap_button: undo_button
+    then:
+      - api_called: DELETE /api/v1/trials/{last_trial_id}
+      - trial_history_bar_shows: ["✓", "✓"]
+      - undo_button_disabled: false
+  
+  - scenario: offline_data_collection
+    id: TS-RT-004
+    given:
+      - user_role: rbt
+      - screen: trial_recording
+      - network: offline
+    when:
+      - tap_button: correct_button
+      - tap_button: incorrect_button
+    then:
+      - offline_banner_visible: true
+      - trials_queued_locally: 2
+      - ui_remains_responsive: true
+      - toast_shown: "Saved offline, will sync later"
+  
+  - scenario: voice_note_entry
+    id: TS-RT-005
+    priority: P3
+    given:
+      - user_role: rbt
+      - screen: trial_recording
+    when:
+      - tap_button: note_button
+      - tap_button: voice_button
+      - speak: "Student needed extra prompt for this trial"
+      - tap_button: save_note
+    then:
+      - state_transitions: [ready → note_entry → ready]
+      - note_saved_with_trial: true
+      - note_text_contains: "extra prompt"
+
+accessibility:
+  - screen_reader_labels:
+      correct_button: "Record correct response"
+      prompted_button: "Record prompted response"
+      incorrect_button: "Record incorrect response"
+  - minimum_touch_target: 44x44 px
+  - color_contrast: WCAG AA compliant
+  - haptic_alternatives: visual feedback for each action
+
+offline_behavior:
+  - data_persistence: IndexedDB (mobile)
+  - queue_strategy: FIFO with timestamp
+  - conflict_resolution: server_wins (with notification)
+  - max_queue_size: 1000 items
+  - sync_trigger: [network_reconnect, manual_sync, app_foreground]
+
+related_files:
+  - component: src/components/TrialRecorder/TrialRecorder.tsx
+  - test: src/components/TrialRecorder/TrialRecorder.test.tsx
+  - api: src/api/trials.ts
+  - store: src/stores/trialStore.ts
+  - offline: src/services/offlineQueue.ts
+
+notes: |
+  - This is the most frequently used screen in the app - performance is critical
+  - Haptic feedback must work even in silent mode
+  - Consider large button sizes for use while actively working with student
+  - Error states should never block data entry - always queue offline
+  - Session stats update in real-time but don't block trial recording
