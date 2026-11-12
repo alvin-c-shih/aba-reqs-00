@@ -1,0 +1,10 @@
+<section id="arch-models" data-transition="fade" style="background:#f6f5f1;color:#1b1f23;font-family:'Inter', Arial, sans-serif;padding:96px;display:flex;flex-direction:row;gap:64px;align-items:center">
+<div style="width:440px;display:flex;flex-direction:column;gap:28px">
+<p style="font-size:24px;font-weight:600;color:#6b46b0;letter-spacing:2px;text-transform:uppercase">Architecture · prototype</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:600;line-height:1.08">Local models behind six gates</h2>
+<p style="font-size:30px;line-height:1.4;color:#454c54">Text: llama.cpp server running Gemma 4 26B, with Ollama and mistral-nemo 12B as fallback. Speech: whisper.cpp running Whisper small.en.</p>
+<p style="font-size:30px;line-height:1.4;color:#454c54">All listen on this machine only. Every output is a draft.</p>
+</div>
+<img src="/_blob/3fd4202c9df306162326b5363e4966f3" alt="Local models diagram: three uses pass through six gates in the API to Ollama with mistral-nemo 12b and a whisper.cpp server with Whisper small.en; outputs are drafts; other hosts are refused" style="width:1224px;height:712px;object-fit:contain;border-radius:20px;border:1px solid #d9d5cb">
+<aside>Text is tried first on the owner's llama.cpp server on port 8080, set by one line of configuration; a summary draft took about seven seconds. If that server is not running, the app falls back to Ollama 0.11.7 on port 11434, where the first answer took about fifty seconds. Speech uses a whisper.cpp server 1.9.5 on port 8178 with a 488 megabyte model. No model was chosen by comparison; each was already on the machine. Measured on an Apple M1 Max with 64 gigabytes.</aside>
+</section>

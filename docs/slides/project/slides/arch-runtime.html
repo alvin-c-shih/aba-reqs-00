@@ -1,0 +1,10 @@
+<section id="arch-runtime" data-transition="fade" style="background:#f6f5f1;color:#1b1f23;font-family:'Inter', Arial, sans-serif;padding:96px;display:flex;flex-direction:row;gap:64px;align-items:center">
+<div style="width:440px;display:flex;flex-direction:column;gap:28px">
+<p style="font-size:24px;font-weight:600;color:#59636b;letter-spacing:2px;text-transform:uppercase">Architecture</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:600;line-height:1.08">What runs, and on which port</h2>
+<p style="font-size:30px;line-height:1.4;color:#454c54">API on 8010, web on 5173, PostgreSQL on a local socket.</p>
+<p style="font-size:30px;line-height:1.4;color:#454c54">Optional model helpers: llama.cpp on 8080 or Ollama on 11434 for text, whisper.cpp on 8178 for speech.</p>
+</div>
+<img src="/_blob/97733c750789437bef2fae0b37456090" alt="Runtime diagram: browser, Vite dev server, API, PostgreSQL, optional Ollama and whisper-server, with configuration, state on disk, commands and environment gates" style="width:1224px;height:690px;object-fit:contain;border-radius:20px;border:1px solid #d9d5cb">
+<aside>Settings come from one git-ignored file. State lives in PostgreSQL plus three folders under data: uploaded media, the speech model, and a temporary folder for audio being converted. There is no cache, queue or search index. Demo conveniences are gated on the server by environment.</aside>
+</section>

@@ -1,84 +1,49 @@
-# ABA System Requirements & Specifications
+# ABA — data collection & analysis for schools
 
-## Overview
+A working system for Applied Behavior Analysis teams: RBTs record sessions on a phone (online or off), BCBAs see what is working and change course early, families and teachers see what the team shares, school admins manage sites and people, and a system admin runs the platform across schools. Phase 1 is the tested core; Phases 2–4 are first working versions.
 
-This repository contains detailed requirements and specifications for a **hypothetical Applied Behavior Analysis (ABA) system**. This system is designed as a comprehensive test case for evaluating the capabilities of agentic AI coding assistants in understanding complex domain requirements, managing system architecture, and implementing full-featured applications.
+> Fictional product built as an evaluation of agentic coding. Not for clinical use.
 
-## Purpose
+![Program graph with phases and annotations](docs/screenshots/05-bcba-graph-phases.png)
 
-The primary purpose of this repository is to serve as an evaluation framework for agentic AI systems by providing:
+## Try it (about 2 minutes)
+Requires PostgreSQL 14+, Node 20+, [uv](https://docs.astral.sh/uv/).
 
-- **Complete domain documentation** - Comprehensive requirements, user stories, and business logic for a real-world ABA data management platform
-- **Architectural guidance** - System design decisions, architectural patterns, and technical specifications
-- **Implementation specifications** - Detailed mockups, screen flows, data models, and component descriptions
-- **Quality criteria** - Testing strategies, traceability matrices, and acceptance criteria
-- **Progressive complexity** - Structured challenges from MVP to advanced features
-
-By working through this system specification, an agentic AI coding assistant must demonstrate:
-- Requirements analysis and interpretation
-- Domain understanding of ABA concepts and workflows
-- Architectural decision-making
-- Full-stack implementation capability
-- Testing and quality assurance practices
-
-## Repository Structure
-
-```
-├── docs/                          # Complete system documentation
-│   ├── architecture/              # System design and decisions
-│   ├── engineering/               # Technical specifications
-│   ├── product/                   # Product requirements and mockups
-│   └── user-guides/              # End-user documentation
-├── *-questions.md                 # Evaluation questions and scenarios
-└── DELIVERABLES-SUMMARY.md       # Overview of expected deliverables
+```bash
+make setup     # secrets, databases, schema, demo data, dependencies
+make demo      # http://localhost:5173
 ```
 
-## Key Documentation
+On the sign-in page pick a persona — no password in the Demo environment. Each role offers a one-minute tour. **Reset demo** in the purple bar puts everything back.
 
-- **[System Architecture](docs/architecture/system-architecture.md)** - High-level system design
-- **[Product Requirements](docs/product/requirements.md)** - Detailed functional requirements
-- **[Data Models](docs/engineering/data-models.md)** - System data structure specifications
-- **[Testing Strategy](docs/engineering/testing-strategy.md)** - Quality assurance approach
-- **[User Stories](docs/product/user-stories.md)** - User-centric requirements
+| Persona | Role | Start here |
+|---|---|---|
+| Dr. Anita Nair | BCBA | Caseload → Ben T. → "Manding" graph → hover a session, press **N** |
+| Marcus Rivera | RBT | Today → Ben T. → Start session → tap outcomes; try the sync pill's offline switch |
+| Linh Tran | Parent | Ben → read the summary, send a count from home |
+| Grace Adeyemi | Teacher | Ben → goals and how to support them |
+| Priya Raman | School admin (2 sites) | People → Invite parent or teacher; Overview → Optional features |
+| Sam Okafor | System admin | Platform health |
 
-## Evaluation Scope
+Also try as Dr. Nair: "Following group instructions" (a suggested change point), Dee's "Aggression: ABC log", and Ben → Progress report → "Draft with the local model" (needs a local text model: [Ollama](https://ollama.com) with any model, or a llama.cpp `llama-server` with `LLM_URL=http://127.0.0.1:8080` in `.env`). Voice notes are optional: `brew install whisper-cpp`, put `ggml-small.en.bin` in `data/models/whisper/`, add `WHISPER_URL=http://127.0.0.1:8178` to `.env`, run `make speech`, then use Dictate when ending a session as Marcus.
 
-This repository evaluates AI coding assistants across multiple dimensions:
+## What is where
+```
+apps/api/                 FastAPI — one router per responsibility, access rules in deps.py
+apps/web/src/shell        sign-in, navigation, help, tours, command palette
+apps/web/src/areas/       system · school · clinic · collect · family · shared · design
+packages/design-system/   tokens, components, session chart, tour engine
+db/                       SQL migrations and the resettable demo seed
+docs/                     architecture, ADRs, assumptions, screenshots, slide pack
+scripts/                  setup and the end-to-end walkthrough
+```
 
-1. **Comprehension** - Can the AI understand complex, interconnected requirements?
-2. **Architecture** - Can the AI make sound technical decisions and design patterns?
-3. **Implementation** - Can the AI write production-quality code across multiple layers?
-4. **Testing** - Can the AI develop comprehensive test coverage?
-5. **Iteration** - Can the AI handle feedback, refactoring, and evolving requirements?
+## Documentation
+- [Architecture, with diagrams](docs/architecture/README.md) — 13 views from context to a proposed deployment; pictures in `docs/architecture/diagrams/`, generated by `make diagrams`
+- [Decisions (ADRs)](docs/adr/README.md) · [Assumptions](docs/ASSUMPTIONS.md) · [Known gaps](docs/GAPS.md) · [Capabilities by role](docs/product/capabilities.md)
+- [Slide pack](https://claude.ai/artifact/CajfATRbASCf13ZB8Qpom9) — walkthrough of every capability (private link until shared; source in `docs/slides/`)
+- [Guide for coding agents](AGENTS.md)
+- [Archive](docs/archive/) — the 2025 spec, the owner's Q&A, and the 2026-10 review that motivated this rework
 
-## Using This Repository
-
-This repository is intended for:
-
-- **AI researchers** evaluating agentic coding systems
-- **AI engineering teams** benchmarking assistant capabilities
-- **Organizations** assessing AI-assisted development workflows
-- **Educational purposes** demonstrating full-stack system requirements
-
-## System Description
-
-The ABA system is a comprehensive data management platform designed to support Applied Behavior Analysis professionals, including:
-
-- **BCBA (Board Certified Behavior Analyst)** administrators and supervisors
-- **RBT (Registered Behavior Technician)** field practitioners
-- **Data analysts** and supervisors tracking outcomes
-
-The system manages client profiles, behavior tracking, trial sessions, data analysis, and reporting—representing a realistic, production-grade application with multiple user roles, offline capabilities, and complex business logic.
-
-## Getting Started
-
-Refer to the questions files for specific evaluation scenarios:
-
-- **[ABA Requirements Questions](00_aba-requirements-questions.md)** - Foundational requirements
-- **[Additional Questions](01_aba-additional-questions.md)** - Extended scenarios
-- **[Clarifying Questions](02_clarifying-questions.md)** - Specification clarification
-- **[Phase 1 MVP Questions](03_phase1-mvp-questions.md)** - Minimum viable product scope
-
----
-
-**Note:** This is a fictional system created for evaluation purposes. It is not a real ABA management product and should not be used in actual clinical practice.
+## Quality
+`make test` runs 39 API tests (security, tenancy, sync, analytics, family access, two-factor, media, imports) and the type check. `make screenshots` drives the real app through all six roles and regenerates the 78 images in `docs/screenshots/`.

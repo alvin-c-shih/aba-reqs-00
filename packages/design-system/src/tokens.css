@@ -1,0 +1,67 @@
+/* Design tokens — the only place raw colours, sizes and fonts are defined.
+   Components and app code use var(--…) only. Light is default; dark follows the OS
+   unless the user picks a theme (data-theme on <html>). */
+:root {
+  /* surfaces & ink */
+  --paper: #f6f5f1;
+  --surface: #ffffff;
+  --surface-2: #faf9f6;
+  --ink: #1b1f23;
+  --ink-2: #454c54;
+  --muted: #6a717a;
+  --line: #e4e1d9;
+  --line-strong: #c9c5ba;
+
+  /* brand */
+  --accent: #2b4acb;
+  --accent-ink: #ffffff;
+  --accent-soft: #e8edfc;
+  --focus: #2b4acb;
+
+  /* meaning — always paired with a shape or word, never colour alone */
+  --ok: #1d7a4b;       --ok-soft: #e2f3e9;
+  --warn: #96590a;     --warn-soft: #fbf0db;
+  --bad: #b3312b;      --bad-soft: #fae5e3;
+  --info: #2f6f8f;     --info-soft: #e3f0f6;
+  --violet: #6b46b0;   --violet-soft: #efe9fa;
+  --slate: #59636b;    --slate-soft: #eceef0;
+
+  /* environments */
+  --env-demo: #6a3fa2; --env-dev: #1e7a46; --env-qa: #c98a12; --env-prod: #3b4248;
+
+  /* type */
+  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --fs-xs: 12px; --fs-sm: 13px; --fs-md: 15px; --fs-lg: 18px; --fs-xl: 24px; --fs-2xl: 32px;
+
+  /* shape & rhythm (4px grid) */
+  --r-sm: 6px; --r-md: 10px; --r-lg: 16px; --r-full: 999px;
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px;
+  --shadow-1: 0 1px 2px rgba(25, 30, 35, .06);
+  --shadow-2: 0 1px 2px rgba(25, 30, 35, .06), 0 10px 30px rgba(25, 30, 35, .10);
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121416; --surface: #1a1d20; --surface-2: #202427; --ink: #e8eaec; --ink-2: #c3c8cd;
+    --muted: #949ca5; --line: #2c3136; --line-strong: #434a51;
+    --accent: #8ea5ff; --accent-ink: #0d1433; --accent-soft: #212b52; --focus: #8ea5ff;
+    --ok: #62cc92; --ok-soft: #17352a; --warn: #f0b560; --warn-soft: #3a2c13; --bad: #ff8d84; --bad-soft: #3f1e1c;
+    --info: #7cc0e0; --info-soft: #17303c; --violet: #b79df0; --violet-soft: #2c2444; --slate: #a3adb5; --slate-soft: #272c30;
+    --env-demo: #8c62c9; --env-dev: #2e9a5e; --env-qa: #d99b24; --env-prod: #50585f;
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, .4); --shadow-2: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .45);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121416; --surface: #1a1d20; --surface-2: #202427; --ink: #e8eaec; --ink-2: #c3c8cd;
+  --muted: #949ca5; --line: #2c3136; --line-strong: #434a51;
+  --accent: #8ea5ff; --accent-ink: #0d1433; --accent-soft: #212b52; --focus: #8ea5ff;
+  --ok: #62cc92; --ok-soft: #17352a; --warn: #f0b560; --warn-soft: #3a2c13; --bad: #ff8d84; --bad-soft: #3f1e1c;
+  --info: #7cc0e0; --info-soft: #17303c; --violet: #b79df0; --violet-soft: #2c2444; --slate: #a3adb5; --slate-soft: #272c30;
+  --env-demo: #8c62c9; --env-dev: #2e9a5e; --env-qa: #d99b24; --env-prod: #50585f;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, .4); --shadow-2: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .45);
+  color-scheme: dark;
+}

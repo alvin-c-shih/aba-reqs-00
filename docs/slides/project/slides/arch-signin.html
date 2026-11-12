@@ -1,0 +1,10 @@
+<section id="arch-signin" data-transition="fade" style="background:#f6f5f1;color:#1b1f23;font-family:'Inter', Arial, sans-serif;padding:96px;display:flex;flex-direction:row;gap:64px;align-items:center">
+<div style="width:440px;display:flex;flex-direction:column;gap:28px">
+<p style="font-size:24px;font-weight:600;color:#59636b;letter-spacing:2px;text-transform:uppercase">Architecture</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:600;line-height:1.08">One chain for every sign-in</h2>
+<p style="font-size:30px;line-height:1.4;color:#454c54">Throttle, lock, password, second factor, session, audit.</p>
+<p style="font-size:30px;line-height:1.4;color:#454c54">A wrong code counts toward the lock like a wrong password.</p>
+</div>
+<img src="/_blob/44b899a40287409c9e2f20916fad67d5" alt="Sign-in diagram: six-step chain with the refusal at each step, two-factor enrolment steps, and known gaps" style="width:1224px;height:734px;object-fit:contain;border-radius:20px;border:1px solid #d9d5cb">
+<aside>Two-factor is optional per person today and should be enforced for staff before real data. Enrolment uses a typed key, not a QR code. The authenticator secret is stored unencrypted in the database, so it relies on disk encryption. There is no password reset by email.</aside>
+</section>

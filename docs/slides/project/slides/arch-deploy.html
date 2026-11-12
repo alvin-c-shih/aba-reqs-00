@@ -1,0 +1,10 @@
+<section id="arch-deploy" data-transition="fade" style="background:#f6f5f1;color:#1b1f23;font-family:'Inter', Arial, sans-serif;padding:96px;display:flex;flex-direction:row;gap:64px;align-items:center">
+<div style="width:440px;display:flex;flex-direction:column;gap:28px">
+<p style="font-size:24px;font-weight:600;color:#b3312b;letter-spacing:2px;text-transform:uppercase">Architecture · proposed</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:600;line-height:1.08">What production would need</h2>
+<p style="font-size:30px;line-height:1.4;color:#454c54">A starting point for discussion. The server setup shown does not exist yet.</p>
+<p style="font-size:30px;line-height:1.4;color:#454c54">Each red box is an open decision for the owner.</p>
+</div>
+<img src="/_blob/662c1ac1979a12aec7cf9d047b8d7c80" alt="Proposed deployment diagram: devices over HTTPS to a reverse proxy, API, PostgreSQL, secrets, optional local models, backups and monitoring, with decisions needed and what already exists" style="width:1224px;height:690px;object-fit:contain;border-radius:20px;border:1px solid #d9d5cb">
+<aside>Decisions needed first: counsel's ruling on HIPAA or FERPA, on-site or cloud and who operates it, recovery targets, audit retention and enforced two-factor. Already in the repository: production mode removes demo conveniences, the API serves the built app, the database role is unprivileged, and there is a health page.</aside>
+</section>

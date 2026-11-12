@@ -1,0 +1,2 @@
+{ "name": "ABA Data Collection", "short_name": "ABA", "start_url": "/", "display": "standalone",
+  "background_color": "#f6f5f1", "theme_color": "#2b4acb", "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }] }

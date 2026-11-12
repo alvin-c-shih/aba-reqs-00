@@ -1,0 +1,11 @@
+<section id="local-ai" data-transition="fade" style="background:#f6f5f1;color:#1b1f23;font-family:'Inter', Arial, sans-serif;padding:96px;display:flex;flex-direction:row;align-items:center;gap:48px">
+<div style="width:440px;display:flex;flex-direction:column;gap:28px">
+<p style="font-size:24px;font-weight:600;color:#6b46b0;letter-spacing:2px;text-transform:uppercase">Local models · prototype</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:600;line-height:1.08">Drafts written on the school’s own machine</h2>
+<p style="font-size:30px;line-height:1.4;color:#454c54">Draft a family summary, or ask a question about your caseload.</p>
+<p style="font-size:30px;line-height:1.4;color:#454c54">No student data leaves the server. Off until a school switches it on.</p>
+</div>
+<img src="/_blob/b943d45d9d3da5c167e9fefab738c149" alt="Family summary editor with a draft written by a local model, labelled with the model name" style="width:596px;height:406px;object-fit:contain;border-radius:12px;border:1px solid #d9d5cb">
+<img src="/_blob/fed1b415b034b0cffc43c4ad49a1bd5d" alt="Ask about your caseload dialog with an answer from the local model" style="width:596px;height:406px;object-fit:contain;border-radius:12px;border:1px solid #d9d5cb">
+<aside>The owner asked to prototype with local models. Text runs through a model server on localhost, and the code refuses any other host. Every output is a labelled draft; nothing is shared until the BCBA publishes. These drafts came from Gemma 4 26B on the owner's llama.cpp server in about seven seconds; Ollama with mistral-nemo 12B is the fallback. Neither was chosen by comparison, and local models still overstate or invent a sentence, so the review step matters. Voice notes use Whisper small.en through a whisper.cpp server. The architecture section shows both.</aside>
+</section>

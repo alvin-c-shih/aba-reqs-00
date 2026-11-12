@@ -1,0 +1,1238 @@
+<title>ABA Phase 1 Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: three-column "clipboard" — step rail | live stage (device frame) | verify sheet. Ballpoint-blue ink on data-sheet paper. */
+:root{
+  --paper:#F4F6F3; --sheet:#FFFFFF; --ink:#1B2320; --muted:#5B6661; --rule:#D9DFDA; --rule-strong:#B9C2BC;
+  --pen:#2343A8; --pen-soft:#E3E9FA; --hi:#FCE99A; --hi-ink:#5A4300;
+  --ok:#1F7A4A; --ok-soft:#E1F2E8; --warn:#9A5B00; --warn-soft:#FBEFD9; --bad:#B4302A; --bad-soft:#F9E3E1;
+  --env-demo:#6A3FA2; --env-dev:#1E7A46; --env-qa:#E5A126; --env-qa-ink:#2A1C00; --env-prod:#3A4642;
+  --phone:#151A18; --shadow:0 1px 2px rgba(20,30,25,.06),0 8px 24px rgba(20,30,25,.08);
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif; --f-body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111614; --sheet:#1A201E; --ink:#E6ECE8; --muted:#9BA7A1; --rule:#2C3532; --rule-strong:#3F4A46;
+  --pen:#8EA6FF; --pen-soft:#22305C; --hi:#5C4B12; --hi-ink:#FCE99A;
+  --ok:#5FCB8E; --ok-soft:#173326; --warn:#F0B35A; --warn-soft:#3A2B12; --bad:#FF8A80; --bad-soft:#3D1D1B;
+  --env-demo:#8C62C9; --env-dev:#2E9A5E; --env-qa:#E5A126; --env-qa-ink:#2A1C00; --env-prod:#55625D;
+  --phone:#050707; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111614; --sheet:#1A201E; --ink:#E6ECE8; --muted:#9BA7A1; --rule:#2C3532; --rule-strong:#3F4A46;
+  --pen:#8EA6FF; --pen-soft:#22305C; --hi:#5C4B12; --hi-ink:#FCE99A;
+  --ok:#5FCB8E; --ok-soft:#173326; --warn:#F0B35A; --warn-soft:#3A2B12; --bad:#FF8A80; --bad-soft:#3D1D1B;
+  --env-demo:#8C62C9; --env-dev:#2E9A5E; --env-qa:#E5A126; --env-qa-ink:#2A1C00; --env-prod:#55625D;
+  --phone:#050707; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:0 32px}
+h1,h2,h3{font-family:var(--f-display);font-stretch:85%;text-wrap:balance;margin:0;line-height:1.15}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--pen);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.tiny{font-size:12px}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--pen-soft);padding:0 4px;border-radius:3px}
+
+/* top bar */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding-block:16px 12px;border-bottom:1px solid var(--rule)}
+.top h1{font-size:22px;font-weight:800;letter-spacing:-.01em}
+.top .sub{color:var(--muted);font-size:13px}
+.top .grow{flex:1 1 200px;min-width:0}
+.progress{display:flex;align-items:center;gap:10px;font-size:13px}
+.progress .bar{width:140px;height:6px;background:var(--rule);border-radius:3px;overflow:hidden}
+.progress .bar i{display:block;height:100%;background:var(--pen)}
+.btn{border:1px solid var(--rule-strong);background:var(--sheet);border-radius:6px;padding:6px 12px;font-weight:600;font-size:14px;line-height:1.2}
+.btn:hover{border-color:var(--pen)}
+.btn.primary{background:var(--pen);border-color:var(--pen);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#0E1530}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0E1530}}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--pen)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.sm{padding:3px 8px;font-size:13px}
+
+/* layout */
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr) 340px;gap:20px;padding-top:16px;align-items:start}
+@media (max-width:1180px){.layout{grid-template-columns:200px minmax(0,1fr)}.notes{grid-column:2}}
+@media (max-width:780px){.notes{grid-column:1}}
+@media (max-width:780px){.layout{grid-template-columns:minmax(0,1fr)}.rail{display:none}.rail-select{display:block!important}}
+.rail{position:sticky;top:12px;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto;padding-right:4px}
+.rail .act{font-family:var(--f-display);font-stretch:85%;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:11.5px;color:var(--muted);margin:14px 0 4px}
+.rail .act:first-child{margin-top:0}
+.rail button{display:flex;gap:8px;width:100%;text-align:left;border:0;background:none;padding:5px 6px;border-radius:5px;align-items:baseline}
+.rail button:hover{background:var(--pen-soft)}
+.rail button.cur{background:var(--pen-soft);color:var(--pen);font-weight:700}
+.rail .n{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);min-width:18px}
+.rail .v{margin-left:auto;font-size:11px}
+.rail-select{display:none;margin-top:12px}
+.rail-select select{width:100%;padding:8px;border:1px solid var(--rule-strong);border-radius:6px;background:var(--sheet)}
+
+/* stage */
+.stage-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:10px}
+.stage-head .eyebrow{font-family:var(--f-mono);font-size:12px;color:var(--pen);text-transform:uppercase;letter-spacing:.06em}
+.stage-head h2{font-size:28px;font-weight:800;width:100%}
+.lede{max-width:68ch;margin:0 0 14px;color:var(--ink)}
+.stage{min-width:0}
+.navrow{display:flex;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
+
+/* frames */
+.frame{background:var(--sheet);border:1px solid var(--rule-strong);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);min-width:0}
+.frame .chrome{display:flex;align-items:center;gap:6px;padding:7px 10px;border-bottom:1px solid var(--rule);font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.frame .chrome i{width:9px;height:9px;border-radius:50%;background:var(--rule-strong);display:inline-block}
+.frame .chrome .url{margin-left:8px;background:var(--paper);padding:2px 8px;border-radius:4px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.web-body{padding:16px;min-height:300px}
+.phones{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.phone{width:min(100%,350px);background:var(--phone);border-radius:30px;padding:10px;box-shadow:var(--shadow)}
+.phone .screen{background:var(--sheet);border-radius:22px;overflow:hidden;min-height:600px;display:flex;flex-direction:column;position:relative}
+.phone .owner{color:#C9D2CD;font-size:12px;text-align:center;padding:2px 0 8px;font-family:var(--f-mono)}
+.statusbar{display:flex;justify-content:space-between;align-items:center;padding:6px 14px 4px;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.ph-body{padding:12px 14px 16px;flex:1;display:flex;flex-direction:column;gap:10px}
+
+/* env banner */
+.env{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;padding:7px 12px;font-family:var(--f-mono);font-size:12px;color:#fff;font-weight:500}
+.env b{font-weight:700;letter-spacing:.05em}
+.env.demo{background:var(--env-demo)} .env.dev{background:var(--env-dev)} .env.qa{background:var(--env-qa);color:var(--env-qa-ink)}
+.env.prod{background:var(--env-prod);padding-block:3px;font-size:11px}
+.env .sp{flex:1}
+.phone .env{font-size:11px;padding:6px 12px;gap:2px 10px}
+
+/* app ui pieces */
+.app-nav{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--rule);margin:-16px -16px 14px;padding:8px 12px;background:var(--paper)}
+.app-nav span{padding:4px 10px;border-radius:5px;font-size:13.5px;color:var(--muted)}
+.app-nav span.on{background:var(--sheet);color:var(--ink);font-weight:700;box-shadow:inset 0 0 0 1px var(--rule)}
+table.t{width:100%;border-collapse:collapse;font-size:13.5px}
+table.t th{text-align:left;font-weight:700;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--rule-strong);padding:6px 8px}
+table.t td{border-bottom:1px solid var(--rule);padding:6px 8px;vertical-align:top}
+table.t td.num,table.t th.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.tscroll{overflow-x:auto}
+.field{display:flex;flex-direction:column;gap:3px;min-width:0}
+.field label{font-size:12.5px;font-weight:700;color:var(--muted)}
+.field input,.field select,.field textarea{border:1px solid var(--rule-strong);border-radius:6px;padding:7px 9px;background:var(--sheet);min-width:0;width:100%}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.card{border:1px solid var(--rule);border-radius:8px;padding:12px;background:var(--sheet);min-width:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.pill{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:1px 9px;font-size:12px;font-weight:700;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.bad{background:var(--bad-soft);color:var(--bad)} .pill.info{background:var(--pen-soft);color:var(--pen)} .pill.neutral{background:var(--paper);color:var(--muted);box-shadow:inset 0 0 0 1px var(--rule)}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--pen-soft);color:var(--pen);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none}
+.callout{border-left:3px solid var(--pen);background:var(--pen-soft);padding:8px 12px;border-radius:0 6px 6px 0;font-size:13.5px}
+.callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+.callout.bad{border-color:var(--bad);background:var(--bad-soft)}
+.callout.ok{border-color:var(--ok);background:var(--ok-soft)}
+.undo-bar{display:flex;gap:6px;align-items:center;margin-left:auto}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:6px;font-size:14px;z-index:50;box-shadow:var(--shadow)}
+.tempw{font-family:var(--f-mono);font-size:16px;background:var(--hi);color:var(--hi-ink);padding:4px 10px;border-radius:4px;letter-spacing:.04em}
+
+/* mobile widgets */
+.m-title{font-family:var(--f-display);font-stretch:85%;font-weight:800;font-size:19px}
+.m-list button{display:flex;width:100%;gap:10px;align-items:center;text-align:left;background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:10px;margin-bottom:8px}
+.m-list button:hover{border-color:var(--pen)}
+.bigbtn{border:0;border-radius:12px;padding:16px;font-size:18px;font-weight:800;font-family:var(--f-display);font-stretch:90%;color:#fff;width:100%;display:flex;justify-content:center;align-items:center;gap:8px;min-height:56px}
+.b-correct{background:#1F7A4A} .b-incorrect{background:#B4302A} .b-prompted{background:#A86A00} .b-nr{background:#5C6762}
+.b-pen{background:var(--pen)}
+:root[data-theme="dark"] .b-pen{color:#0E1530}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .b-pen{color:#0E1530}}
+.tri-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hist{display:flex;flex-wrap:wrap;gap:3px;min-height:26px;font-family:var(--f-mono);font-size:13px}
+.hist span{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;background:var(--paper);border:1px solid var(--rule)}
+.hist span.c{color:#1F7A4A} .hist span.i{color:#B4302A} .hist span.p{color:#A86A00} .hist span.n{color:var(--muted)}
+.hist span.void{text-decoration:line-through;opacity:.4}
+.hist span.pend{outline:2px dashed var(--warn);outline-offset:-2px}
+.target-card{border:2px solid var(--rule-strong);border-radius:12px;padding:12px;text-align:center}
+.target-card .sd{font-size:22px;font-weight:800;font-family:var(--f-display);font-stretch:90%}
+.tabs{display:flex;gap:4px;overflow-x:auto}
+.tabs button{border:1px solid var(--rule);background:var(--paper);border-radius:999px;padding:4px 10px;font-size:12.5px;white-space:nowrap}
+.tabs button.on{background:var(--pen);color:#fff;border-color:var(--pen)}
+.counter{font-family:var(--f-mono);font-size:64px;font-weight:500;text-align:center;line-height:1}
+.tap-area{border:2px dashed var(--pen);background:var(--pen-soft);color:var(--pen);border-radius:16px;min-height:150px;font-size:20px;font-weight:800;width:100%}
+.lockbadge{font-size:11.5px;font-family:var(--f-mono);padding:4px 8px;border-radius:6px;background:var(--ok-soft);color:var(--ok)}
+.lockbadge.lost{background:var(--warn-soft);color:var(--warn)}
+.outbox{font-family:var(--f-mono);font-size:11.5px}
+.overlay{position:absolute;inset:0;background:rgba(10,14,12,.72);display:flex;align-items:center;justify-content:center;padding:18px;z-index:5}
+.overlay .card{width:100%}
+.pinpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.pinpad button{padding:12px;font-size:18px;border-radius:10px;border:1px solid var(--rule);background:var(--paper)}
+.dots{display:flex;gap:10px;justify-content:center;margin:10px 0}
+.dots i{width:12px;height:12px;border-radius:50%;border:2px solid var(--pen)}
+.dots i.f{background:var(--pen)}
+
+/* tour */
+.tour-wrap{position:relative}
+.spot{position:relative;z-index:3;box-shadow:0 0 0 4px var(--hi),0 0 0 2000px rgba(10,14,12,.55);border-radius:6px}
+.tour-tip{position:relative;z-index:4;margin-top:10px;background:var(--sheet);border:2px solid var(--pen);border-radius:8px;padding:12px;max-width:360px;box-shadow:var(--shadow)}
+.tour-clip{overflow:hidden;border-radius:10px}
+
+/* chart */
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-family:var(--f-mono);font-size:10.5px}
+.chart .grid line{stroke:var(--rule)}
+.chart .axis{stroke:var(--rule-strong)}
+.chart .path{fill:none;stroke:var(--pen);stroke-width:2}
+.chart .pt{fill:var(--sheet);stroke:var(--pen);stroke-width:2}
+.chart .pt.today{fill:var(--hi);stroke:var(--hi-ink)}
+.chart .pt.corr{fill:var(--warn);stroke:var(--warn)}
+.chart .phase{stroke:var(--ink);stroke-dasharray:4 3;stroke-width:1.2}
+.chart .phase-l{fill:var(--ink);font-family:var(--f-body);font-weight:700;font-size:11px}
+.chart .crit{stroke:var(--ok);stroke-dasharray:2 3}
+.chart .bar{fill:var(--pen);opacity:.85}
+.chart .bar.base{fill:var(--muted);opacity:.6}
+.chart .bar.today{fill:var(--hi-ink)}
+
+/* notes */
+.notes{position:sticky;top:12px;display:flex;flex-direction:column;gap:14px;min-width:0}
+@media (max-width:1180px){.notes{position:static}}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:14px;min-width:0}
+.sheet h3{font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;font-stretch:80%}
+.checks{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.checks li{display:flex;gap:8px;align-items:flex-start}
+.checks input{margin-top:4px;accent-color:var(--pen)}
+.dec{border:1px solid var(--warn);background:var(--warn-soft);border-radius:8px;padding:8px 10px;font-size:13.5px}
+.dec + .dec{margin-top:6px}
+.dec b{font-family:var(--f-mono);color:var(--warn)}
+.spec{font-size:12.5px;color:var(--muted)}
+.verdicts{display:flex;gap:6px;flex-wrap:wrap}
+.verdicts button{flex:1 1 80px;border:1px solid var(--rule-strong);background:var(--sheet);border-radius:6px;padding:6px;font-weight:700;font-size:13px}
+.verdicts button.on.pass{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.verdicts button.on.concern{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.verdicts button.on.fail{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.others{font-size:12.5px;display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.dbi table{font-size:12.5px}
+.dbi td,.dbi th{padding:3px 6px!important}
+.delta{color:var(--ok);font-weight:700}
+.flash{background:var(--hi);color:var(--hi-ink)}
+details summary{cursor:pointer;font-weight:700}
+.report{--ok:#1F7A4A;--ok-soft:#E1F2E8;--warn:#9A5B00;--warn-soft:#FBEFD9;--bad:#B4302A;--bad-soft:#F9E3E1;--pen:#2343A8;--pen-soft:#E3E9FA;--muted:#5B6661;--ink:#1B2320;--sheet:#fff;--paper:#F4F6F3;--rule:#E1E5E2;--rule-strong:#B9C2BC;--hi:#FCE99A;--hi-ink:#5A4300;background:#fff;color:#1B2320;border:1px solid var(--rule-strong);border-radius:4px;padding:22px;max-width:720px;box-shadow:var(--shadow)}
+.report h3{font-size:20px}
+.report .chart text{fill:#5B6661}
+.report .chart .path{stroke:#2343A8}
+.report .chart .pt{fill:#fff;stroke:#2343A8}
+.report .chart .phase{stroke:#1B2320} .report .chart .phase-l{fill:#1B2320}
+.report .chart .grid line{stroke:#E1E5E2}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header class="top">
+  <div class="grow">
+    <h1>ABA Phase 1 Walkthrough</h1>
+    <div class="sub">A clickable, linear tour of every Phase 1 capability. Runs on fake demo data in your browser. Nothing here touches real records.</div>
+  </div>
+  <div class="progress"><span id="prog-label" class="mono">1 / 20</span><span class="bar"><i id="prog-bar"></i></span></div>
+  <button class="btn" id="reset-btn" data-act="resetAll">Reset walkthrough</button>
+</header>
+
+<div class="rail-select"><label class="tiny muted" for="step-select">Step</label><select id="step-select"></select></div>
+
+<main class="layout">
+  <nav class="rail" id="rail" aria-label="Walkthrough steps"></nav>
+  <section class="stage" id="stage-col">
+    <div class="stage-head"><span class="eyebrow" id="st-eyebrow"></span><h2 id="st-title"></h2></div>
+    <p class="lede" id="st-lede"></p>
+    <div id="stage"></div>
+    <div class="navrow">
+      <button class="btn" data-act="prev" id="prev-btn">← Previous</button>
+      <button class="btn primary" data-act="next" id="next-btn">Next step →</button>
+    </div>
+  </section>
+  <aside class="notes" id="notes">
+    <div class="sheet" id="verify-sheet"></div>
+    <div class="sheet" id="signoff-sheet"></div>
+    <div class="sheet dbi" id="db-sheet"></div>
+  </aside>
+</main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+"use strict";
+/* ============================================================
+   Utilities
+   ============================================================ */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const uid = (p = "") => p + Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-4);
+const DAY = 864e5, MIN = 6e4;
+const fmtDate = (t) => new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+const fmtTime = (t) => new Date(t).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+const fmtStamp = (t) => { const d = new Date(t); const p = n => String(n).padStart(2, "0"); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; };
+const mmss = (s) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+const initials = (n) => n.split(/\s+/).filter(Boolean).map(w => w[0]).join("").slice(0, 2).toUpperCase();
+/* A void is active unless it was itself voided ("Restore"). */
+function activeVoids(list) {
+  const voids = list.filter(o => o.kind === "void"); const ids = new Set(voids.map(v => v.id));
+  const cancelled = new Set(voids.filter(v => ids.has(v.ref_id)).map(v => v.ref_id));
+  return new Set(voids.filter(v => !cancelled.has(v.id) && !ids.has(v.ref_id)).map(v => v.ref_id));
+}
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+let toastTimer;
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 2200); }
+
+/* ============================================================
+   Fake database (stands in for PostgreSQL in the demo env)
+   ============================================================ */
+const TABLES = ["users", "students", "treatment_plans", "programs", "program_versions", "targets", "staff_assignments", "sessions", "session_locks", "observations", "phases", "corrections", "review_items", "reports", "devices", "audit_logs"];
+let DB, baseline = {}, stepBaseline = {}, lastTouched = {};
+function count(t) { return DB[t].length; }
+function insert(t, row) { DB[t].push(row); lastTouched[t] = Date.now(); return row; }
+function touch(t) { lastTouched[t] = Date.now(); }
+function audit(action, resource, detail) {
+  insert("audit_logs", { id: uid("al_"), at: Date.now(), user_id: S.actor, action, resource, detail, env: S.env });
+}
+const user = (id) => DB.users.find(u => u.id === id);
+const student = (id) => DB.students.find(s => s.id === id);
+const program = (id) => DB.programs.find(p => p.id === id);
+
+function seed() {
+  DB = Object.fromEntries(TABLES.map(t => [t, []]));
+  const rnd = mulberry32(20261011);
+  const now = Date.now();
+  const U = (id, first, last, role, email) => insert("users", { id, name: `${first} ${last}`, role, email, active: true, must_change_pw: id === "u_admin", created_at: now - 120 * DAY });
+  U("u_admin", "Morgan", "Avery", "admin", "m.avery@demo.example.org");
+  U("u_bcba", "Priya", "Nair", "bcba", "p.nair@demo.example.org");
+  U("u_rbt", "Jordan", "Lee", "rbt", "j.lee@demo.example.org");
+  insert("devices", { id: "dev_jordan", user_id: "u_rbt", label: "Jordan's phone", last_sync: now - 5 * MIN });
+
+  const ST = (id, name, grade) => { insert("students", { id, name, grade, active: true, bcba_id: "u_bcba", consent: { photo: false, video: false } }); insert("treatment_plans", { id: "tp_" + id, student_id: id, name: "2026–27 Treatment Plan", start: now - 90 * DAY, status: "active" }); insert("staff_assignments", { id: uid("sa_"), student_id: id, user_id: "u_rbt", from: now - 90 * DAY, to: null, by: "u_bcba" }); };
+  ST("s_ava", "Ava M.", "Grade 2"); ST("s_ben", "Ben T.", "Grade 1"); ST("s_cal", "Cal R.", "Grade 3"); ST("s_dee", "Dee K.", "Kindergarten"); ST("s_eli", "Eli W.", "Grade 4");
+
+  const P = (id, sid, name, method, goal, extra = {}) => {
+    const p = insert("programs", Object.assign({ id, student_id: sid, plan_id: "tp_" + sid, name, method, goal, version: 1, active: true,
+      mastery: method === "trial" ? { threshold: 80, n: 3, m: 3, minTrials: 10, promptedCounts: "not_independent" } : null, created_at: now - 90 * DAY }, extra));
+    insert("program_versions", { id: uid("pv_"), program_id: id, version: 1, at: p.created_at, by: "u_bcba", reason: "Initial version" });
+    return p;
+  };
+  const targetsFor = (pid, list) => list.forEach((sd, i) => insert("targets", { id: `${pid}_t${i}`, program_id: pid, sd, order: i, active: true }));
+  P("p_ava_rid", "s_ava", "Receptive ID — Animals", "trial", "acquire"); targetsFor("p_ava_rid", ["Dog", "Cat", "Bird", "Horse", "Fish"]);
+  P("p_ava_dir", "s_ava", "Follows 1-step directions", "trial", "acquire"); targetsFor("p_ava_dir", ["Clap hands", "Stand up", "Touch nose"]);
+  P("p_ben_tact", "s_ben", "Tacting — Colors", "trial", "acquire"); targetsFor("p_ben_tact", ["Red", "Blue", "Green", "Yellow"]);
+  P("p_ben_mand", "s_ben", "Manding (requests)", "frequency", "acquire");
+  P("p_cal_sight", "s_cal", "Sight words — Set B", "trial", "acquire"); targetsFor("p_cal_sight", ["the", "and", "was", "said", "from"]);
+  P("p_dee_help", "s_dee", "Requesting help", "frequency", "acquire");
+  P("p_dee_tant", "s_dee", "Tantrum", "duration", "reduce");
+  P("p_eli_agg", "s_eli", "Aggression", "frequency", "reduce");
+  P("p_eli_elope", "s_eli", "Elopement", "duration", "reduce");
+
+  // weekday session dates counting back from yesterday
+  function weekdays(nBack, skipLastDays = 0, gapAt = -1, gapDays = 0) {
+    const out = []; let d = new Date(now - (1 + skipLastDays) * DAY); d.setHours(9, 30, 0, 0);
+    let i = 0;
+    while (out.length < nBack) {
+      const wd = d.getDay();
+      if (wd !== 0 && wd !== 6) { out.unshift(d.getTime() + Math.floor(rnd() * 240) * MIN); i++; if (i === gapAt) d = new Date(d.getTime() - gapDays * DAY); }
+      d = new Date(d.getTime() - DAY);
+    }
+    return out;
+  }
+  const phase = (pid, label, kind, at) => insert("phases", { id: uid("ph_"), program_id: pid, label, kind, start_at: at - MIN, by: "u_bcba" });
+  const trialResult = (pct) => { const correct = Math.max(0, Math.min(10, Math.round(pct / 10))); const rest = 10 - correct; const pr = Math.round(rest * .5), inc = Math.round(rest * .35); return [["correct", correct], ["prompted", pr], ["incorrect", inc], ["no_response", Math.max(0, rest - pr - inc)]]; };
+  function addSession(sid, at, progs) {
+    const s = insert("sessions", { id: uid("se_"), student_id: sid, rbt_id: "u_rbt", start: at, end: at + 35 * MIN, program_ids: progs.map(p => p.pid), status: "completed", type: "direct", notes: "" });
+    progs.forEach(({ pid, val }) => {
+      const p = program(pid); let t = at + MIN;
+      if (p.method === "trial") {
+        const tg = DB.targets.filter(x => x.program_id === pid);
+        const outcomes = trialResult(val).flatMap(([k, n]) => Array(n).fill(k)).sort(() => rnd() - .5);
+        outcomes.forEach((o, i) => insert("observations", { id: uid("ob_"), session_id: s.id, program_id: pid, target_id: tg[i % tg.length].id, kind: "trial", value: o, device_id: "dev_jordan", lock_epoch: 1, recorded_at: t += 40000, review_state: "live" }));
+      } else if (p.method === "frequency") {
+        for (let i = 0; i < Math.max(0, Math.round(val)); i++) insert("observations", { id: uid("ob_"), session_id: s.id, program_id: pid, kind: "event", value: 1, device_id: "dev_jordan", lock_epoch: 1, recorded_at: t += 90000, review_state: "live" });
+      } else {
+        const eps = val > 0 ? Math.max(1, Math.round(val / 90)) : 0; let left = val;
+        for (let i = 0; i < eps; i++) { const sec = i === eps - 1 ? left : Math.round(val / eps); left -= sec; insert("observations", { id: uid("ob_"), session_id: s.id, program_id: pid, kind: "duration", value: Math.max(5, sec), device_id: "dev_jordan", lock_epoch: 1, recorded_at: t += 300000, review_state: "live" }); }
+      }
+    });
+    return s;
+  }
+  const noise = (a) => (rnd() - .5) * 2 * a;
+  const clamp = (v) => Math.max(0, Math.min(100, v));
+
+  // Ava: baseline → teaching → fading; mastered. Second program on track.
+  { const d = weekdays(20); const ph = [0, 5, 13];
+    phase("p_ava_rid", "Baseline", "baseline", d[0]); phase("p_ava_rid", "Gestural prompts + tokens", "intervention", d[5]); phase("p_ava_rid", "Prompt fading", "intervention", d[13]);
+    phase("p_ava_dir", "Baseline", "baseline", d[0]); phase("p_ava_dir", "Most-to-least prompting", "intervention", d[4]);
+    d.forEach((t, i) => {
+      const rid = i < 5 ? 40 + noise(8) : i < 13 ? 48 + (i - 5) * 3.6 + noise(5) : (i >= 17 ? 88 + noise(3) : 76 + (i - 13) * 2.5 + noise(3));
+      const dir = i < 4 ? 30 + noise(6) : 34 + (i - 4) * 2.4 + noise(5);
+      addSession("s_ava", t, [{ pid: "p_ava_rid", val: clamp(rid) }, { pid: "p_ava_dir", val: clamp(Math.min(dir, 75)) }]);
+    }); void ph; }
+  // Ben: plateau.
+  { const d = weekdays(15); phase("p_ben_tact", "Baseline", "baseline", d[0]); phase("p_ben_tact", "Errorless teaching", "intervention", d[4]);
+    phase("p_ben_mand", "Baseline", "baseline", d[0]); phase("p_ben_mand", "PECS Phase II", "intervention", d[4]);
+    d.forEach((t, i) => addSession("s_ben", t, [{ pid: "p_ben_tact", val: clamp(i < 4 ? 40 + noise(6) : 55 + noise(6)) }, { pid: "p_ben_mand", val: i < 4 ? 3 + noise(1) : 4 + noise(1.4) }])); }
+  // Cal: rose, then regressed after a gap.
+  { const d = weekdays(20, 0, 4, 10); phase("p_cal_sight", "Baseline", "baseline", d[0]); phase("p_cal_sight", "Flashcard DTT", "intervention", d[4]);
+    d.forEach((t, i) => addSession("s_cal", t, [{ pid: "p_cal_sight", val: clamp(i < 4 ? 30 + noise(6) : i < 16 ? 38 + (i - 4) * 3.4 + noise(4) : 46 + noise(5)) }])); }
+  // Dee: new student, baseline only.
+  { const d = weekdays(3); phase("p_dee_help", "Baseline", "baseline", d[0]); phase("p_dee_tant", "Baseline", "baseline", d[0]);
+    d.forEach((t, i) => addSession("s_dee", t, [{ pid: "p_dee_help", val: [1, 0, 1][i] }, { pid: "p_dee_tant", val: [420, 380, 510][i] }])); }
+  // Eli: behavior reduction working.
+  { const d = weekdays(18); phase("p_eli_agg", "Baseline", "baseline", d[0]); phase("p_eli_agg", "FCT + DRA", "intervention", d[5]);
+    phase("p_eli_elope", "Baseline", "baseline", d[0]); phase("p_eli_elope", "FCT + DRA", "intervention", d[5]);
+    d.forEach((t, i) => addSession("s_eli", t, [{ pid: "p_eli_agg", val: i < 5 ? 10 + noise(2) : Math.max(0, 9 - (i - 5) * .6 + noise(1.2)) }, { pid: "p_eli_elope", val: Math.round(i < 5 ? 600 + noise(120) : Math.max(30, 520 - (i - 5) * 35 + noise(60))) }])); }
+
+  audit_seed();
+  function audit_seed() { DB.audit_logs.push({ id: uid("al_"), at: now - 2 * MIN, user_id: "system", action: "demo_seed_installed", resource: "database", detail: "seed v2026.10 · 5 students · env=demo", env: "demo" }); }
+}
+
+/* ============================================================
+   Analytics (computed from the append-only observation log)
+   ============================================================ */
+function sessionValue(pid, sid) {
+  const p = program(pid);
+  const obs = DB.observations.filter(o => o.session_id === sid && o.program_id === pid && o.review_state !== "pending" && o.review_state !== "rejected");
+  const voided = activeVoids(obs);
+  const live = obs.filter(o => o.kind !== "void" && !voided.has(o.id));
+  const corr = DB.corrections.filter(c => c.session_id === sid && c.program_id === pid).sort((a, b) => b.at - a.at)[0];
+  let value = null, n = 0, extra = {};
+  if (p.method === "trial") {
+    const tr = live.filter(o => o.kind === "trial"); n = tr.length;
+    const k = { correct: 0, prompted: 0, incorrect: 0, no_response: 0 }; tr.forEach(o => k[o.value]++);
+    extra = k; value = n ? Math.round(100 * k.correct / n) : null;
+  } else if (p.method === "frequency") { n = live.filter(o => o.kind === "event").length; value = n; }
+  else { const ds = live.filter(o => o.kind === "duration"); n = ds.length; value = Math.round(ds.reduce((a, o) => a + o.value, 0) / 6) / 10; }
+  const original = value;
+  if (corr) value = corr.new_value;
+  return { value, n, extra, corrected: !!corr, original, corr };
+}
+function phasesFor(pid) { return DB.phases.filter(p => p.program_id === pid).sort((a, b) => a.start_at - b.start_at); }
+function series(pid) {
+  const ph = phasesFor(pid);
+  return DB.sessions.filter(s => s.program_ids.includes(pid) && s.status !== "active").sort((a, b) => a.start - b.start).map(s => {
+    const v = sessionValue(pid, s.id); let phase = null; ph.forEach(p => { if (p.start_at <= s.start) phase = p; });
+    return Object.assign({ session: s, t: s.start, phase }, v);
+  }).filter(r => r.value !== null && (program(pid).method !== "trial" || r.n > 0));
+}
+function slopePerWeek(rows) {
+  if (rows.length < 2) return 0; const xs = rows.map(r => r.t / (7 * DAY)), ys = rows.map(r => r.value);
+  const mx = xs.reduce((a, b) => a + b) / xs.length, my = ys.reduce((a, b) => a + b) / ys.length;
+  let num = 0, den = 0; xs.forEach((x, i) => { num += (x - mx) * (ys[i] - my); den += (x - mx) ** 2; }); return den ? num / den : 0;
+}
+function programStatus(pid) {
+  const p = program(pid), rows = series(pid);
+  if (!rows.length) return { code: "nodata", label: "No data yet", tone: "neutral", why: "No sessions recorded for this program." };
+  const cur = rows[rows.length - 1].phase; const inPh = rows.filter(r => r.phase === cur);
+  const mean = inPh.reduce((a, r) => a + r.value, 0) / inPh.length; const slope = slopePerWeek(inPh);
+  const unit = p.method === "trial" ? "pts" : p.method === "frequency" ? "/session" : "min";
+  if (cur && cur.kind === "baseline") return { code: "baseline", label: "Baseline", tone: "info", why: `${inPh.length} baseline session${inPh.length === 1 ? "" : "s"}. No intervention phase yet.` };
+  if (p.method === "trial" && p.mastery) {
+    const m = p.mastery, last = inPh.slice(-m.m);
+    const hits = last.filter(r => r.value >= m.threshold && r.n >= m.minTrials).length;
+    if (last.length >= m.m && hits >= m.n) return { code: "mastered", label: "Mastered", tone: "ok", why: `Met the rule: ≥${m.threshold}% independent in ${m.n} of the last ${m.m} sessions (≥${m.minTrials} trials each).` };
+  }
+  if (p.goal === "reduce") {
+    if (inPh.length >= 4 && slope < -0.1 * Math.max(1, mean)) return { code: "improving", label: "Decreasing", tone: "ok", why: `Trend ${slope.toFixed(1)} ${unit}/week in “${cur.label}”. Behavior is going down.` };
+    if (inPh.length >= 6 && slope > 0) return { code: "worse", label: "Increasing", tone: "bad", why: `Trend +${slope.toFixed(1)} ${unit}/week. Behavior is going up.` };
+    return { code: "ontrack", label: "Monitoring", tone: "neutral", why: `${inPh.length} sessions in phase.` };
+  }
+  if (inPh.length >= 6) {
+    const best = Math.max(...inPh.slice(0, -3).map((r, i, a) => i <= a.length - 3 ? (a[i].value + a[i + 1].value + a[i + 2].value) / 3 : -1));
+    const last3 = inPh.slice(-3).reduce((a, r) => a + r.value, 0) / 3;
+    if (best - last3 >= 15) return { code: "regression", label: "Regression", tone: "bad", why: `Last 3 sessions average ${Math.round(last3)}%, ${Math.round(best - last3)} pts below this phase's best 3-session run (${Math.round(best)}%). Rule: drop ≥15 pts.` };
+    const flat = p.method === "trial" ? Math.abs(slope) < 2 : Math.abs(slope) < 0.05 * Math.max(1, mean);
+    const below = p.method === "trial" ? mean < (p.mastery?.threshold ?? 80) : true;
+    if (flat && below) return { code: "noprogress", label: "No progress", tone: "warn", why: `${inPh.length} sessions in “${cur.label}”, trend ${slope >= 0 ? "+" : ""}${slope.toFixed(1)} ${unit}/week, mean ${Math.round(mean)}${p.method === "trial" ? "%" : ""}. Rule: ≥6 sessions with a trend under ±2 pts/week and below criterion.` };
+  }
+  return { code: "ontrack", label: "Progressing", tone: "ok", why: `Trend ${slope >= 0 ? "+" : ""}${slope.toFixed(1)} ${unit}/week in “${cur?.label ?? "current phase"}”.` };
+}
+function studentFlags(sid) { return DB.programs.filter(p => p.student_id === sid && p.active).map(p => ({ p, st: programStatus(p.id) })); }
+
+/* ============================================================
+   Chart (inline SVG). Data paths break at phase lines.
+   ============================================================ */
+function chartSVG(pid, opts = {}) {
+  const p = program(pid), rows = series(pid).slice(-(opts.last || 999));
+  const W = opts.w || 640, H = opts.h || 240, L = 40, R = 12, T = 26, B = 30;
+  if (!rows.length) return `<p class="muted">No sessions yet.</p>`;
+  const isPct = p.method === "trial";
+  const maxV = isPct ? 100 : Math.max(4, Math.ceil(Math.max(...rows.map(r => r.value)) * 1.15));
+  const x = (i) => L + (rows.length === 1 ? (W - L - R) / 2 : i * (W - L - R) / (rows.length - 1));
+  const y = (v) => T + (H - T - B) * (1 - v / maxV);
+  const ticks = isPct ? [0, 20, 40, 60, 80, 100] : [0, .25, .5, .75, 1].map(f => Math.round(maxV * f * 10) / 10);
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(p.name)} graph">`;
+  s += `<g class="grid">${ticks.map(t => `<line x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}"/><text x="${L - 6}" y="${y(t) + 3}" text-anchor="end">${t}${isPct ? "%" : ""}</text>`).join("")}</g>`;
+  s += `<line class="axis" x1="${L}" x2="${L}" y1="${T}" y2="${H - B}"/><line class="axis" x1="${L}" x2="${W - R}" y1="${H - B}" y2="${H - B}"/>`;
+  if (isPct && p.mastery && !opts.bar) s += `<line class="crit" x1="${L}" x2="${W - R}" y1="${y(p.mastery.threshold)}" y2="${y(p.mastery.threshold)}"/><text x="${L + 4}" y="${y(p.mastery.threshold) - 4}" style="fill:var(--ok)">criterion ${p.mastery.threshold}%</text>`;
+  const step = Math.max(1, Math.ceil(rows.length / 7));
+  rows.forEach((r, i) => { if (i % step === 0 || i === rows.length - 1) s += `<text x="${x(i)}" y="${H - B + 14}" text-anchor="middle">${fmtDate(r.t)}</text>`; });
+  s += `<text x="${L}" y="${H - 2}">sessions →</text>`;
+  // phase lines between sessions
+  for (let i = 1; i < rows.length; i++) if (rows[i].phase !== rows[i - 1].phase && rows[i].phase) {
+    const px = (x(i) + x(i - 1)) / 2; const nearEnd = px > W - R - 120; s += `<line class="phase" x1="${px}" x2="${px}" y1="${T - 8}" y2="${H - B}"/><text class="phase-l" x="${nearEnd ? px - 4 : px + 4}" y="${T - 12}" text-anchor="${nearEnd ? "end" : "start"}">${esc(rows[i].phase.label)}</text>`;
+  }
+  if (rows[0].phase) s += `<text class="phase-l" x="${L + 4}" y="${T - 12}">${esc(rows[0].phase.label)}</text>`;
+  if (opts.bar) {
+    const bw = Math.max(3, Math.min(26, (W - L - R) / rows.length * .65));
+    rows.forEach((r, i) => s += `<rect class="bar ${r.phase?.kind === "baseline" ? "base" : ""} ${opts.highlight === r.session.id ? "today" : ""}" x="${x(i) - bw / 2}" y="${y(r.value)}" width="${bw}" height="${Math.max(0, H - B - y(r.value))}"><title>${fmtDate(r.t)}: ${r.value}</title></rect>`);
+  } else {
+    let seg = [];
+    const flush = () => { if (seg.length > 1) s += `<polyline class="path" points="${seg.join(" ")}"/>`; seg = []; };
+    rows.forEach((r, i) => { if (i && r.phase !== rows[i - 1].phase) flush(); seg.push(`${x(i)},${y(r.value)}`); }); flush();
+    rows.forEach((r, i) => s += `<circle class="pt ${r.corrected ? "corr" : ""} ${opts.highlight === r.session.id ? "today" : ""}" cx="${x(i)}" cy="${y(r.value)}" r="${opts.highlight === r.session.id ? 6 : 4}"><title>${fmtDate(r.t)}: ${r.value}${isPct ? "%" : ""}${r.corrected ? " (corrected)" : ""}</title></circle>`);
+  }
+  return s + `</svg>`;
+}
+
+/* ============================================================
+   App state
+   ============================================================ */
+let S;
+function freshState() {
+  return {
+    step: 0, env: "demo", actor: "u_admin", ui: {}, loggedIn: false,
+    devices: {
+      A: { id: "dev_jordan", user: "u_rbt", online: true, outbox: [], local: [], redo: [], session: null, epoch: null, pinLocked: false, pin: "", lostLockNotice: null, view: "list", tab: null, takeoverAt: null },
+      B: { id: "dev_sam", user: null, online: true, outbox: [], local: [], redo: [], session: null, epoch: null, pinLocked: false, pin: "", lostLockNotice: null, view: "list", tab: null },
+    },
+    forms: {}, tour: 0, reviewDone: false,
+  };
+}
+function snapCounts() { return Object.fromEntries(TABLES.map(t => [t, count(t)])); }
+
+/* Undo/redo history for forms (client-side only, cleared on submit) */
+function formHist(key, initial) {
+  if (!S.forms[key]) S.forms[key] = { vals: structuredClone(initial), undo: [], redo: [] };
+  return S.forms[key];
+}
+function formCommit(key, field, value) {
+  const f = S.forms[key]; if (!f || f.vals[field] === value) return;
+  f.undo.push(structuredClone(f.vals)); if (f.undo.length > 50) f.undo.shift(); f.redo = [];
+  f.vals[field] = value;
+}
+function undoBar(key) { const f = S.forms[key]; return `<div class="undo-bar"><button class="btn sm" data-act="formUndo" data-arg="${key}" ${f.undo.length ? "" : "disabled"} data-testid="undo-btn" title="Undo (Ctrl+Z)">↶ Undo</button><button class="btn sm" data-act="formRedo" data-arg="${key}" ${f.redo.length ? "" : "disabled"} data-testid="redo-btn" title="Redo (Ctrl+Shift+Z)">↷ Redo</button></div>`; }
+
+/* ============================================================
+   Device (mobile) sync model: local-first, outbox, receipts
+   ============================================================ */
+function deviceRecord(dk, obs) {
+  const d = S.devices[dk];
+  const row = Object.assign({ id: uid("ob_"), device_id: d.id, lock_epoch: d.epoch, recorded_at: Date.now(), session_id: d.session }, obs);
+  d.local.push(row); d.outbox.push(row);
+  if (d.online) flush(dk);
+  return row;
+}
+function flush(dk) {
+  const d = S.devices[dk]; if (!d.online || !d.outbox.length) return 0;
+  const lock = DB.session_locks.find(l => l.session_id === d.session) || DB.session_locks.find(l => l.device_id === d.id);
+  let pending = 0;
+  d.outbox.forEach(o => {
+    if (DB.observations.some(x => x.id === o.id)) return; // idempotent
+    const curLock = DB.session_locks.find(l => l.session_id === o.session_id);
+    let state = "live";
+    if (curLock && o.lock_epoch !== curLock.epoch && o.recorded_at > curLock.acquired_at) state = "pending";
+    insert("observations", Object.assign({}, o, { review_state: state, received_at: Date.now() }));
+    if (state === "pending") pending++;
+  });
+  if (pending) {
+    const sess = DB.sessions.find(s => s.id === d.session);
+    insert("review_items", { id: uid("rv_"), session_id: d.session, student_id: sess?.student_id, device_id: d.id, user_id: d.user, count: pending, status: "open", created_at: Date.now() });
+    audit("observations_quarantined", "session:" + d.session, `${pending} observations recorded after lock moved`);
+  }
+  const dev = DB.devices.find(x => x.id === d.id); if (dev) { dev.last_sync = Date.now(); touch("devices"); }
+  const n = d.outbox.length; d.outbox = []; void lock; return n;
+}
+function receipt(dk) {
+  const d = S.devices[dk]; if (!d.session) return "";
+  const mine = d.local.filter(o => o.session_id === d.session);
+  const confirmed = mine.filter(o => DB.observations.some(x => x.id === o.id)).length;
+  const pend = DB.observations.filter(x => x.session_id === d.session && x.device_id === d.id && x.review_state === "pending").length;
+  return `<span class="outbox ${confirmed === mine.length ? "" : ""}" data-testid="sync-receipt">Server confirmed <b>${confirmed}/${mine.length}</b>${pend ? ` · <span style="color:var(--warn)">${pend} awaiting BCBA review</span>` : ""}</span>`;
+}
+function acquireLock(dk, studentId, force) {
+  const d = S.devices[dk]; const now = Date.now();
+  let sess = DB.sessions.find(s => s.student_id === studentId && s.status === "active");
+  let lock = sess && DB.session_locks.find(l => l.session_id === sess.id);
+  if (lock && lock.device_id === d.id) { d.session = sess.id; d.epoch = lock.epoch; d.view = "collect"; d.tab = d.tab || sess.program_ids[0]; return { ok: true }; }
+  if (lock && !force) return { held: lock };
+  if (!sess) {
+    const progs = DB.programs.filter(p => p.student_id === studentId && p.active).map(p => p.id);
+    sess = insert("sessions", { id: uid("se_"), student_id: studentId, rbt_id: d.user, start: now, end: null, program_ids: progs, status: "active", type: "direct", notes: "", handoffs: [] });
+    audit("session_started", "session:" + sess.id, `${user(d.user).name} on ${d.id}`);
+  }
+  if (lock) {
+    const prev = lock.user_id; lock.epoch += 1; lock.user_id = d.user; lock.device_id = d.id; lock.acquired_at = now; lock.heartbeat_at = now; touch("session_locks");
+    sess.handoffs.push({ at: now, from: prev, to: d.user });
+    audit("session_lock_taken_over", "session:" + sess.id, `${user(prev).name} → ${user(d.user).name} (epoch ${lock.epoch})`);
+  } else {
+    lock = insert("session_locks", { id: uid("lk_"), session_id: sess.id, student_id: studentId, user_id: d.user, device_id: d.id, epoch: 1, acquired_at: now, heartbeat_at: now });
+    audit("session_lock_acquired", "session:" + sess.id, `${user(d.user).name} (epoch 1)`);
+  }
+  d.session = sess.id; d.epoch = lock.epoch; d.view = "collect"; d.tab = d.tab || sess.program_ids[0]; d.lostLockNotice = null;
+  return { ok: true };
+}
+function lockState(dk) {
+  const d = S.devices[dk]; if (!d.session) return null;
+  const lock = DB.session_locks.find(l => l.session_id === d.session);
+  if (!lock) return { mine: false, released: true };
+  return { mine: lock.device_id === d.id && lock.epoch === d.epoch, lock };
+}
+
+/* ============================================================
+   Shared render pieces
+   ============================================================ */
+const ENV_LABEL = { demo: "DEMO · fake data", dev: "DEV", qa: "QA", prod: "PRODUCTION" };
+function banner(roleUserId, compact) {
+  const u = user(roleUserId); const role = u ? u.role.toUpperCase() : "—";
+  if (compact) return `<div class="env ${S.env}" data-testid="env-banner"><b data-testid="env-name">${S.env.toUpperCase()}</b><span data-testid="user-role">${role}</span><span class="sp"></span><span data-clock data-testid="current-time">${fmtTime(Date.now())}</span></div>`;
+  return `<div class="env ${S.env}" data-testid="env-banner"><b data-testid="env-name">${ENV_LABEL[S.env]}</b><span data-testid="user-role">Role: ${role}</span><span>${u ? esc(u.name) : "Not signed in"}</span><span class="sp"></span><span data-clock data-full data-testid="current-time">${fmtStamp(Date.now())}</span></div>`;
+}
+function web(path, who, inner, nav) {
+  return `<div class="frame"><div class="chrome"><i></i><i></i><i></i><span class="url">https://${S.env === "prod" ? "" : S.env + "."}aba.school.local${esc(path)}</span></div>${banner(who)}<div class="web-body">${nav ? `<div class="app-nav">${nav.map(([l, on]) => `<span class="${on ? "on" : ""}">${l}</span>`).join("")}</div>` : ""}${inner}</div></div>`;
+}
+const navAdmin = (on) => [["Dashboard", on === 0], ["Users", on === 1], ["System health", on === 2], ["Audit log", on === 3]];
+const navBcba = (on) => [["My students", on === 0], ["Programs", on === 1], ["Graphs", on === 2], ["Review queue", on === 3], ["Reports", on === 4]];
+function phone(dk, inner, label) {
+  const d = S.devices[dk]; const u = user(d.user);
+  return `<div class="phone"><div class="owner">${esc(label || (u ? u.name + "'s phone" : "Phone"))}</div><div class="screen">${banner(d.user, true)}
+    <div class="statusbar"><span>${d.online ? "Wi-Fi ●" : "<b style='color:var(--warn)'>Offline</b>"}</span><span data-testid="sync-count-badge">${d.outbox.length ? `⏳ ${d.outbox.length} waiting` : "✓ synced"}</span></div>
+    <div class="ph-body">${inner}</div>${d.pinLocked ? pinOverlay(dk) : ""}</div></div>`;
+}
+function pinOverlay(dk) {
+  const d = S.devices[dk];
+  return `<div class="overlay"><div class="card"><div class="m-title">Locked</div><p class="tiny muted">The session timer is still running and nothing was lost. Enter your PIN to continue. (Demo PIN: 1234)</p>
+  <div class="dots">${[0, 1, 2, 3].map(i => `<i class="${i < d.pin.length ? "f" : ""}"></i>`).join("")}</div>
+  <div class="pinpad">${[1, 2, 3, 4, 5, 6, 7, 8, 9, "", 0, "⌫"].map(k => k === "" ? "<span></span>" : `<button data-act="pin" data-arg="${dk}:${k}">${k}</button>`).join("")}</div></div></div>`;
+}
+function studentChip(st) { return `<span class="pill ${st.tone}" title="${esc(st.why)}">${esc(st.label)}</span>`; }
+
+/* Mobile app screens (used by several steps) */
+function mobileScreen(dk, opts = {}) {
+  const d = S.devices[dk];
+  if (!d.user) return `<p class="muted">Not signed in.</p>`;
+  if (d.view === "list") {
+    const mine = DB.staff_assignments.filter(a => a.user_id === d.user && !a.to).map(a => student(a.student_id));
+    return `<div class="m-title">My students</div><div class="m-list" data-testid="mobile-student-list">${mine.map(s => {
+      const lockRow = DB.session_locks.find(l => l.student_id === s.id); const holder = lockRow && lockRow.user_id !== d.user ? user(lockRow.user_id) : null;
+      return `<button data-act="mPick" data-arg="${dk}:${s.id}" ${opts.only && opts.only !== s.id ? "disabled style='opacity:.45'" : ""}><span class="avatar">${initials(s.name)}</span><span style="min-width:0"><b>${esc(s.name)}</b><br><span class="tiny muted">${DB.programs.filter(p => p.student_id === s.id && p.active).length} active programs${holder ? ` · <span style="color:var(--warn)">in session with ${esc(holder.name)}</span>` : ""}</span></span></button>`;
+    }).join("")}</div>`;
+  }
+  if (d.view === "held") {
+    const lock = DB.session_locks.find(l => l.student_id === d.pickStudent); const h = user(lock.user_id);
+    const offlineHolder = Object.values(S.devices).find(x => x.id === lock.device_id && !x.online);
+    return `<div class="m-title">${esc(student(d.pickStudent).name)}</div><div class="callout warn" data-testid="lock-warning-banner"><b>${esc(h.name)} is running this session.</b><br>Started ${fmtTime(DB.sessions.find(s => s.id === lock.session_id).start)}. Last heard from their phone: ${offlineHolder ? "<b>18 min ago (offline)</b>" : "just now"}.<br><br>If you take over, anything ${esc(h.name.split(" ")[0])} records from now on goes to the BCBA for review instead of straight into the graphs. Nothing is deleted.</div>
+      <button class="bigbtn b-pen" data-act="mTakeover" data-arg="${dk}" data-testid="steal-lock-btn">Take over session</button><button class="btn" data-act="mBack" data-arg="${dk}">Cancel</button>`;
+  }
+  if (d.view === "collect") return collectScreen(dk);
+  if (d.view === "summary") return summaryScreen(dk);
+  if (d.view === "graph") { const s = DB.sessions.find(x => x.id === d.lastSession); const pid = d.graphPid || s.program_ids[0];
+    return `<div class="m-title">${esc(student(s.student_id).name)}</div><div class="tabs">${s.program_ids.map(id => `<button class="${id === pid ? "on" : ""}" data-act="mGraphTab" data-arg="${dk}:${id}">${esc(program(id).name)}</button>`).join("")}</div>
+    <div data-testid="quick-feedback-graph">${chartSVG(pid, { last: 10, w: 320, h: 210, highlight: s.id, bar: program(pid).method !== "trial" })}</div><p class="tiny muted">Last 10 sessions. Today's session is highlighted.</p><button class="btn" data-act="mHome" data-arg="${dk}" data-testid="back-btn">← My students</button>`; }
+  return "";
+}
+function collectScreen(dk) {
+  const d = S.devices[dk]; const sess = DB.sessions.find(s => s.id === d.session); const ls = lockState(dk);
+  const elapsed = (Date.now() - sess.start) / 1000;
+  const pid = d.tab; const p = program(pid);
+  const mine = d.local.filter(o => o.session_id === d.session && o.program_id === pid);
+  const voided = activeVoids(d.local);
+  const serverPending = new Set(DB.observations.filter(o => o.review_state === "pending").map(o => o.id));
+  const lost = ls && !ls.mine && d.online;
+  let body = "";
+  if (p.method === "trial") {
+    const tgs = DB.targets.filter(t => t.program_id === pid && t.active);
+    const trials = mine.filter(o => o.kind === "trial" && !voided.has(o.id));
+    const tg = tgs[trials.length % Math.max(1, tgs.length)];
+    const c = trials.filter(o => o.value === "correct").length;
+    body = `<div class="target-card"><div class="tiny muted" data-testid="current-trial">Trial ${trials.length + 1} · Target</div><div class="sd">${esc(tg ? tg.sd : "—")}</div></div>
+    <div class="tri-grid"><button class="bigbtn b-correct" data-act="mTrial" data-arg="${dk}:correct" data-testid="trial-correct-btn" ${lost ? "disabled" : ""}>✓ Correct</button><button class="bigbtn b-incorrect" data-act="mTrial" data-arg="${dk}:incorrect" data-testid="trial-incorrect-btn" ${lost ? "disabled" : ""}>✗ Incorrect</button>
+    <button class="bigbtn b-prompted" data-act="mTrial" data-arg="${dk}:prompted" data-testid="trial-prompted-btn" ${lost ? "disabled" : ""}>◐ Prompted</button><button class="bigbtn b-nr" data-act="mTrial" data-arg="${dk}:no_response" data-testid="trial-no-response-btn" ${lost ? "disabled" : ""}>○ No resp.</button></div>
+    <div class="hist" data-testid="trial-history">${mine.filter(o => o.kind === "trial").slice(-20).map(o => `<span class="${{ correct: "c", incorrect: "i", prompted: "p", no_response: "n" }[o.value]} ${voided.has(o.id) ? "void" : ""} ${serverPending.has(o.id) ? "pend" : ""}" title="${o.value}">${{ correct: "✓", incorrect: "✗", prompted: "◐", no_response: "○" }[o.value]}</span>`).join("")}</div>
+    <div class="row tiny" data-testid="trial-summary"><span><b class="mono">${trials.length}</b> trials</span><span>·</span><span><b class="mono">${trials.length ? Math.round(100 * c / trials.length) : 0}%</b> independent correct</span></div>`;
+  } else if (p.method === "frequency") {
+    const ev = mine.filter(o => o.kind === "event" && !voided.has(o.id));
+    body = `<div class="counter" data-testid="frequency-counter">${ev.length}</div><div class="tiny muted" style="text-align:center">${(ev.length / Math.max(1, elapsed / 60)).toFixed(2)} per minute</div>
+    <button class="tap-area" data-act="mEvent" data-arg="${dk}" data-testid="frequency-tap-area" ${lost ? "disabled" : ""}>Tap each time<br>“${esc(p.name)}” occurs</button>`;
+  } else {
+    const run = d.running && d.running.pid === pid ? d.running : null;
+    const ds = mine.filter(o => o.kind === "duration" && !voided.has(o.id));
+    body = `<div class="counter" data-testid="duration-timer" ${run ? "data-run=" + run.start : ""}>${run ? mmss((Date.now() - run.start) / 1000) : "00:00"}</div>
+    <button class="bigbtn ${run ? "b-incorrect" : "b-pen"}" data-act="mDur" data-arg="${dk}" data-testid="${run ? "stop" : "start"}-duration-btn" ${lost ? "disabled" : ""}>${run ? "■ Stop episode" : "▶ Start episode"}</button>
+    <div class="tiny" data-testid="duration-list">${ds.map((o, i) => `Episode ${i + 1}: <span class="mono">${mmss(o.value)}</span>`).join("<br>") || "<span class='muted'>No episodes yet</span>"}</div>
+    <div class="tiny" data-testid="total-duration">Total: <b class="mono">${mmss(ds.reduce((a, o) => a + o.value, 0))}</b></div>`;
+  }
+  const canVoid = mine.some(o => o.kind !== "void" && !voided.has(o.id));
+  return `<div class="row" style="justify-content:space-between"><div class="m-title">${esc(student(sess.student_id).name)}</div><span class="mono tiny" data-testid="session-timer" data-since="${sess.start}">⏱ ${mmss(elapsed)}</span></div>
+  ${lost ? `<div class="callout warn" data-testid="lock-stolen-banner"><b>${esc(user(ls.lock.user_id).name)} took over this session at ${fmtTime(ls.lock.acquired_at)}.</b> Everything you recorded after that is saved and has been sent to the BCBA for review. To keep recording here, take the session back.</div><button class="btn" data-act="mTakeback" data-arg="${dk}">Take session back</button>` : `<span class="lockbadge ${ls && ls.mine ? "" : "lost"}">${d.online ? (ls && ls.mine ? `You hold this session · epoch ${d.epoch}` : "Lock status unknown") : `Offline · holding lock from epoch ${d.epoch}`}</span>`}
+  <div class="tabs">${sess.program_ids.map(id => `<button class="${id === pid ? "on" : ""}" data-act="mTab" data-arg="${dk}:${id}">${esc(program(id).name)}</button>`).join("")}</div>
+  ${body}
+  <div class="row"><button class="btn sm" data-act="mVoid" data-arg="${dk}" ${canVoid && !lost ? "" : "disabled"} data-testid="undo-trial-btn">↶ Void last</button><button class="btn sm" data-act="mRedo" data-arg="${dk}" ${d.redo.length && !lost ? "" : "disabled"} data-testid="redo-trial-btn">↷ Restore</button><span style="margin-left:auto">${receipt(dk)}</span></div>
+  <div class="row"><button class="btn sm" data-act="mEnd" data-arg="${dk}" data-testid="end-session-btn" ${lost ? "disabled" : ""}>End session</button></div>`;
+}
+function summaryScreen(dk) {
+  const d = S.devices[dk]; const sess = DB.sessions.find(s => s.id === d.session);
+  const rows = sess.program_ids.map(pid => { const p = program(pid); const v = sessionValue(pid, sess.id); const live = DB.observations.filter(o => o.session_id === sess.id && o.program_id === pid);
+    return `<tr><td>${esc(p.name)}</td><td class="num">${p.method === "trial" ? `${v.n} trials · ${v.value ?? 0}%` : p.method === "frequency" ? `${v.value} events` : `${v.value} min`}</td><td class="num">${live.filter(o => o.review_state === "pending").length || ""}</td></tr>`; }).join("");
+  const f = formHist("endnote_" + dk, { note: "" });
+  return `<div class="m-title">Session summary</div><div class="tiny muted">${esc(student(sess.student_id).name)} · ${mmss((Date.now() - sess.start) / 1000)} · ${sess.handoffs.length ? `handed off ${sess.handoffs.length}×` : "no handoffs"}</div>
+  <div class="tscroll"><table class="t"><tr><th>Program</th><th class="num">Recorded</th><th class="num">In review</th></tr>${rows}</table></div>
+  <div class="field"><label for="end-note">Final note</label><textarea id="end-note" rows="3" data-form="endnote_${dk}" data-field="note">${esc(f.vals.note)}</textarea></div>
+  <button class="bigbtn b-pen" data-act="mConfirmEnd" data-arg="${dk}" data-testid="confirm-save-btn">Confirm &amp; save</button><button class="btn" data-act="mResume" data-arg="${dk}">Back to session</button>`;
+}
+
+/* ============================================================
+   Steps
+   ============================================================ */
+const STEPS = [
+/* ---------------- Orientation ---------------- */
+{ id: "env", act: "Orientation", title: "Know which system you're in",
+  lede: "Every screen in every environment carries a banner showing the environment, your role and the current time. Switch environments to compare. In Production the banner shrinks to a slim neutral bar so it doesn't look like an error, and the demo tools disappear.",
+  render() {
+    return `<div class="row" style="margin-bottom:12px"><span class="tiny muted">Environment (server setting <code>ENV</code>):</span>${["demo", "dev", "qa", "prod"].map(e => `<button class="btn sm ${S.env === e ? "primary" : ""}" data-act="setEnv" data-arg="${e}">${e.toUpperCase()}</button>`).join("")}</div>
+    ${web("/admin", "u_bcba", `<h3 style="font-size:18px">Good morning, Dr. Nair</h3><p class="muted">The banner above stays visible on every screen. It can't be dismissed.</p>
+    <div class="callout ${S.env === "prod" ? "ok" : ""}">${S.env === "prod" ? "Production: demo-data tools, test hooks and the debug page's write tools are disabled on the server, not just hidden." : `In <b>${S.env.toUpperCase()}</b>, demo/test tools are available. They are refused by the server in Production.`}</div>`, navBcba(0))}`;
+  },
+  verify: ["The banner shows environment, role and a live timestamp", "The four environments are impossible to confuse at a glance", "Production looks calm and still shows env, role and time", "The banner stays on screen and has no close button"],
+  decisions: [["D10", "Banner colors. Docs disagree (purple/orange/yellow/none vs blue/green/yellow/red). Shown: purple / green / amber / slim neutral."], ["D11", "Demo is its own environment with its own database, not a dataset installed into Prod."]],
+  spec: "COMMON-003 · FR-11.1 · 01-authentication.md", },
+
+/* ---------------- Admin ---------------- */
+{ id: "login", act: "Admin setup", title: "Sign in for the first time",
+  lede: "Morgan, the school's administrator, signs in with a temporary password and must set a new one before going further. Both events go to the audit log.",
+  render() {
+    const f = formHist("login", { email: "m.avery@demo.example.org", pw: "••••••••", np: "", np2: "" });
+    if (S.loggedIn) return web("/admin", "u_admin", `<div class="callout ok">Signed in as Morgan Avery (Admin). Password changed. Two audit entries were written. Watch <b>audit_logs</b> in the live database panel.</div>`, navAdmin(0));
+    const pw = f.vals.np; const score = [pw.length >= 12, /[A-Z]/.test(pw), /[0-9]/.test(pw), /[^A-Za-z0-9]/.test(pw)].filter(Boolean).length;
+    const ok = score === 4 && pw === f.vals.np2;
+    return `<div class="frame"><div class="chrome"><i></i><i></i><i></i><span class="url">https://${S.env}.aba.school.local/login</span></div>${banner(null)}<div class="web-body" style="max-width:420px">
+      ${!S.ui.pwStage ? `<h3 style="font-size:20px;margin-bottom:10px">Sign in</h3>
+        <div class="field"><label for="login-email">Email</label><input id="login-email" data-testid="login-email" value="${esc(f.vals.email)}" readonly></div>
+        <div class="field" style="margin-top:8px"><label for="login-password">Temporary password</label><input id="login-password" data-testid="login-password" value="${esc(f.vals.pw)}" readonly></div>
+        <button class="btn primary" style="margin-top:12px" data-act="loginSubmit" data-testid="login-submit">Sign in</button>`
+      : `<h3 style="font-size:20px;margin-bottom:6px">Set a new password</h3><p class="tiny muted">You're using a temporary password. Choose your own to continue.</p>
+        <div class="field"><label for="new-password">New password</label><input id="new-password" type="text" data-testid="new-password" data-form="login" data-field="np" value="${esc(f.vals.np)}" placeholder="Try: Riverside-Room12!" autocomplete="off"></div>
+        <div class="row tiny" data-testid="password-strength" style="margin:6px 0"><span class="pill ${score === 4 ? "ok" : score >= 2 ? "warn" : "bad"}">${["Too weak", "Weak", "Fair", "Almost", "Strong"][score]}</span><span class="muted">12+ chars, upper case, number, symbol</span></div>
+        <div class="field"><label for="confirm-password">Confirm</label><input id="confirm-password" type="text" data-testid="confirm-password" data-form="login" data-field="np2" value="${esc(f.vals.np2)}" autocomplete="off"></div>
+        <button class="btn primary" style="margin-top:12px" data-act="pwSubmit" ${ok ? "" : "disabled"}>Save password</button>`}
+    </div></div>`;
+  },
+  verify: ["You can't reach the app until the temporary password is replaced", "Password rules are shown before you type, not after a failure", "Sign-in and password change both appear in audit_logs"],
+  decisions: [["D1", "HIPAA vs FERPA. This drives password, 2FA and audit rules. 2FA is scheduled for Phase 3; confirm that's acceptable for a pilot with real students."]],
+  spec: "AUTH-001 · COMMON-001", },
+
+{ id: "tour", act: "Admin setup", title: "Guided tour for new staff",
+  lede: "First sign-in starts a short role-specific tour. With high staff turnover, this replaces most of the training session. It can be skipped and restarted from Settings.",
+  render() {
+    const steps = [["banner", "This bar tells you which system you're in. Purple means Demo: practice freely, nothing is real."], ["nav", "Users is where you create staff accounts. System health is where you check that data is actually being saved."], ["health", "If something looks wrong, open System health first. It shows the live count of every table."]];
+    const i = S.tour; const done = i >= steps.length;
+    const sp = (k) => !done && steps[i][0] === k ? "spot" : "";
+    return `<div class="frame tour-clip"><div class="chrome"><i></i><i></i><i></i><span class="url">https://${S.env}.aba.school.local/admin</span></div>
+    <div class="${sp("banner")}">${banner("u_admin")}</div>
+    <div class="web-body"><div class="app-nav ${sp("nav")}">${navAdmin(0).map(([l, on]) => `<span class="${on ? "on" : ""}">${l}</span>`).join("")}</div>
+    <div class="cards"><div class="card"><b>Users</b><div class="mono" style="font-size:26px">${count("users")}</div></div><div class="card ${sp("health")}"><b>System health</b><div><span class="pill ok">All checks passing</span></div></div><div class="card"><b>Devices</b><div class="mono" style="font-size:26px">${count("devices")}</div></div></div>
+    ${done ? `<div class="callout ok" style="margin-top:12px">Tour complete. Restart it any time from Settings → Restart tour.</div><button class="btn" style="margin-top:8px" data-act="tourRestart" data-testid="restart-tour-btn">Restart tour</button>` :
+      `<div class="tour-tip" data-testid="tour-tooltip"><div class="tiny mono" data-testid="tour-step-counter">Step ${i + 1} of ${steps.length}</div><p style="margin:6px 0 10px">${steps[i][1]}</p><div class="row"><button class="btn sm" data-act="tourPrev" ${i ? "" : "disabled"} data-testid="tour-prev">Previous</button><button class="btn sm primary" data-act="tourNext" data-testid="tour-next">${i === steps.length - 1 ? "Finish" : "Next"}</button><button class="btn sm ghost" data-act="tourSkip" data-testid="tour-skip">Skip tour</button></div></div>`}
+    </div></div>`;
+  },
+  verify: ["Each tour step points at a real element and says why it matters", "You can step backward, skip, and restart", "The copy is plain enough for a first-week RBT"],
+  decisions: [],
+  spec: "COMMON-002 · 06-guided-tour.md", },
+
+{ id: "users", act: "Admin setup", title: "Create a staff account (with undo)",
+  lede: "Morgan adds Sam Ortiz, a new RBT. Change a few fields, then press Undo or Ctrl+Z and watch each change reverse. The temporary password is shown once and never stored in readable form.",
+  render() {
+    const f = formHist("newuser", { first: "Sam", last: "Ortiz", email: "s.ortiz@demo.example.org", role: "rbt" });
+    const created = S.ui.createdTemp;
+    return web("/admin/users", "u_admin", `<div class="row" style="margin-bottom:8px"><h3 style="font-size:18px">Users</h3><span class="pill neutral" data-testid="users-count">${count("users")} users</span></div>
+    <div class="tscroll"><table class="t" data-testid="users-table"><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr>${DB.users.map(u => `<tr><td>${esc(u.name)}</td><td class="mono tiny">${esc(u.email)}</td><td>${u.role.toUpperCase()}</td><td><span class="pill ${u.active ? "ok" : "neutral"}">${u.active ? "Active" : "Inactive"}</span>${u.must_change_pw ? ' <span class="pill warn">temp password</span>' : ""}</td></tr>`).join("")}</table></div>
+    <div class="card" style="margin-top:14px" data-testid="create-user-modal"><div class="row"><b>New user</b>${undoBar("newuser")}</div>
+      <div class="grid2" style="margin-top:8px">
+        <div class="field"><label for="user-first-name">First name</label><input id="user-first-name" data-testid="user-first-name" data-form="newuser" data-field="first" value="${esc(f.vals.first)}"></div>
+        <div class="field"><label for="user-last-name">Last name</label><input id="user-last-name" data-testid="user-last-name" data-form="newuser" data-field="last" value="${esc(f.vals.last)}"></div>
+        <div class="field"><label for="user-email">Email</label><input id="user-email" data-testid="user-email" data-form="newuser" data-field="email" value="${esc(f.vals.email)}"></div>
+        <div class="field"><label for="user-role">Role</label><select id="user-role" data-testid="user-role" data-form="newuser" data-field="role">${["admin", "bcba", "rbt"].map(r => `<option value="${r}" ${f.vals.role === r ? "selected" : ""}>${r.toUpperCase()}</option>`).join("")}</select></div>
+      </div>
+      <div class="row" style="margin-top:10px"><button class="btn primary" data-act="createUser" ${DB.users.some(u => u.email === f.vals.email) || !f.vals.first.trim() || !f.vals.last.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.vals.email) ? "disabled" : ""}>Create user</button>${DB.users.some(u => u.email === f.vals.email) ? `<span class="tiny" style="color:var(--bad)">That email already has an account.</span>` : ""}</div>
+      ${created ? `<div class="callout warn" style="margin-top:10px"><b>Temporary password for ${esc(created.name)}:</b> <span class="tempw" data-testid="user-temp-password">${created.pw}</span> <button class="btn sm" data-act="copyTemp" data-testid="copy-password-btn">Copy</button><br><span class="tiny">Shown once. Hand it over in person; it must be changed at first sign-in.</span></div>` : ""}
+    </div>`, navAdmin(1));
+  },
+  verify: ["Undo/Redo buttons and Ctrl+Z / Ctrl+Shift+Z step through field changes", "Undo history clears after Create", "A duplicate email is refused before submit", "users goes up by 1 and an audit entry appears"],
+  decisions: [["D13", "Undo scope. Forms use undo/redo. Data collection uses Void last, shown in step 10."]],
+  spec: "ADMIN-001 · ADMIN-002 · COMMON-004", },
+
+{ id: "health", act: "Admin setup", title: "Check that data is really being saved",
+  lede: "The System health page reads row counts straight from the database and runs a write/read-back probe on demand. The live database panel on the right shows the same counts throughout this walkthrough, so every claim of “saved” can be checked.",
+  render() {
+    const prod = S.env === "prod"; const c = S.ui.canary;
+    return web("/admin/health", "u_admin", `<div class="row"><h3 style="font-size:18px">System health</h3><span class="pill neutral mono">db: aba_${S.env}</span><button class="btn sm" data-act="noop" style="margin-left:auto" data-testid="refresh-metrics-btn">Refresh</button></div>
+    <div class="grid2" style="margin-top:10px">
+      <div class="card"><b>Write probe</b><p class="tiny muted">Writes a row, reads it back on a second connection, then deletes it.</p><button class="btn sm" data-act="canary" data-testid="canary-btn">Run probe</button>
+        ${c ? `<div class="tiny mono" style="margin-top:6px"><span class="pill ok">PASS</span> write ${c.w}ms · read-back ${c.r}ms · delete ${c.d}ms</div>` : ""}</div>
+      <div class="card" data-testid="demo-data-status"><b>Demo data</b><p class="tiny muted">Seed v2026.10 · 5 students · dates relative to today, so the nightly reset keeps it current.</p>
+        ${prod ? `<button class="btn sm" disabled>Reset demo data</button><div class="tiny" style="color:var(--bad);margin-top:4px">Refused by server: not available in Production.</div>` : `<button class="btn sm danger" data-act="${S.ui.confirmReset ? "resetDemo" : "askResetDemo"}" data-testid="reset-demo-btn">${S.ui.confirmReset ? "Click again to wipe and reseed" : "Reset demo data"}</button>`}</div>
+      <div class="card"><b>Devices</b><div class="tiny" data-testid="last-sync-timestamp">${DB.devices.map(d => `${esc(d.label)} · synced ${Math.max(0, Math.round((Date.now() - d.last_sync) / MIN))} min ago`).join("<br>")}</div></div>
+    </div>
+    <div class="tscroll" style="margin-top:12px"><table class="t" data-testid="db-row-counts"><tr><th>Table</th><th class="num">Rows</th><th class="num">Changed in this walkthrough</th></tr>${TABLES.map(t => `<tr><td class="mono">${t}</td><td class="num" data-testid="${t}-row-count">${count(t).toLocaleString()}</td><td class="num">${count(t) - baseline[t] ? `<span class="delta">+${count(t) - baseline[t]}</span>` : "—"}</td></tr>`).join("")}</table></div>`, navAdmin(2));
+  },
+  verify: ["Row counts change when you do something (try the probe, then look at audit_logs)", "The demo reset can't run in Production. Switch to PROD in step 1 to see the refusal.", "Device sync times are visible to the admin"],
+  decisions: [["D11", "Demo data lives in its own environment. “Install demo data” into a database holding real students is removed."]],
+  spec: "ADMIN-005 · FR-11.2 · REVIEW §4.6", },
+
+/* ---------------- BCBA ---------------- */
+{ id: "bcba", act: "BCBA planning", title: "Spot who needs attention",
+  lede: "Dr. Priya Nair, the BCBA, opens her caseload. Each program is checked against written rules, and every flag shows the rule that fired. The five demo students cover each scenario stakeholders asked for.",
+  enter() { S.actor = "u_bcba"; },
+  render() {
+    return web("/bcba", "u_bcba", `<div class="cards" data-testid="bcba-student-list">${DB.students.map(s => { const fl = studentFlags(s.id);
+      return `<div class="card"><div class="row"><span class="avatar">${initials(s.name)}</span><div><b>${esc(s.name)}</b><div class="tiny muted">${esc(s.grade)} · ${fl.length} programs</div></div></div>
+      <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">${fl.map(({ p, st }) => `<div class="tiny row" style="justify-content:space-between;gap:6px"><span style="min-width:0">${esc(p.name)}</span>${studentChip(st)}</div>`).join("")}</div></div>`; }).join("")}</div>
+      <details style="margin-top:12px"><summary>Why each flag fired</summary><div class="tscroll"><table class="t" style="margin-top:6px"><tr><th>Student</th><th>Program</th><th>Flag</th><th>Rule result</th></tr>${DB.programs.map(p => { const st = programStatus(p.id); return `<tr><td>${esc(student(p.student_id).name)}</td><td>${esc(p.name)}</td><td>${studentChip(st)}</td><td class="tiny">${esc(st.why)}</td></tr>`; }).join("")}</table></div></details>`, navBcba(0));
+  },
+  verify: ["Mastery, no progress, regression, baseline-only and behavior decreasing each appear at least once", "Each flag shows its rule result when you hover it or open “Why each flag fired”", "Initials are shown instead of student photos"],
+  decisions: [["D8", "Mastery must be a structured rule (shown), not free text, or these flags can't be computed."], ["D9", "% correct counts prompted trials as not independent. Confirm, or make it a per-program setting."]],
+  spec: "BCBA-001 · FR-6.4 · REVIEW §4.7", },
+
+{ id: "program", act: "BCBA planning", title: "Build a program with a mastery rule",
+  lede: "Dee K. is new and only has baseline data. Priya adds a discrete-trial program to Dee's treatment plan. The mastery rule is built from fields, so the system can evaluate it, and a plain-English sentence confirms what was entered.",
+  render() {
+    const f = formHist("prog", { name: "Receptive ID — Colors", method: "trial", threshold: "80", n: "3", m: "3", minTrials: "10", targets: "Red, Blue, Yellow" });
+    const saved = DB.programs.find(p => p.id === S.ui.newProgram);
+    const v = f.vals;
+    return web("/bcba/students/dee/plan", "u_bcba", `<div class="row"><h3 style="font-size:18px">Dee K. › 2026–27 Treatment Plan › New program</h3>${saved ? "" : undoBar("prog")}</div>
+    ${saved ? `<div class="callout ok" style="margin-top:10px">Saved <b>${esc(saved.name)}</b> as version 1 with ${DB.targets.filter(t => t.program_id === saved.id).length} targets. It already appears on Jordan's phone, because Jordan is assigned to Dee.</div>` : `
+    <div class="grid2" style="margin-top:10px">
+      <div class="field"><label for="program-name">Program name</label><input id="program-name" data-testid="program-name" data-form="prog" data-field="name" value="${esc(v.name)}"></div>
+      <div class="field"><label for="program-method">Data collection</label><select id="program-method" data-testid="program-method" data-form="prog" data-field="method"><option value="trial" ${v.method === "trial" ? "selected" : ""}>Trial-by-trial</option><option value="frequency" ${v.method === "frequency" ? "selected" : ""}>Frequency</option><option value="duration" ${v.method === "duration" ? "selected" : ""}>Duration</option></select></div>
+    </div>
+    <fieldset class="card" style="margin-top:10px" data-testid="program-mastery"><legend class="tiny" style="font-weight:700">Mastery rule</legend>
+      <div class="grid2">
+        <div class="field"><label for="m-th">At least (% independent)</label><input id="m-th" type="number" min="1" max="100" data-form="prog" data-field="threshold" value="${esc(v.threshold)}"></div>
+        <div class="field"><label for="m-n">in this many sessions…</label><input id="m-n" type="number" min="1" max="10" data-form="prog" data-field="n" value="${esc(v.n)}"></div>
+        <div class="field"><label for="m-m">…of the last</label><input id="m-m" type="number" min="1" max="10" data-form="prog" data-field="m" value="${esc(v.m)}"></div>
+        <div class="field"><label for="m-min">with at least (trials each)</label><input id="m-min" type="number" min="1" max="50" data-form="prog" data-field="minTrials" value="${esc(v.minTrials)}"></div>
+      </div>
+      <p class="callout" style="margin:10px 0 0" data-testid="mastery-sentence">Mastered when Dee scores <b>≥${esc(v.threshold)}%</b> independent in <b>${esc(v.n)} of the last ${esc(v.m)}</b> sessions, with at least <b>${esc(v.minTrials)}</b> trials in each. Prompted trials count as not independent.</p>
+      ${+v.n > +v.m ? `<p class="tiny" style="color:var(--bad)">“In this many sessions” can't be more than “of the last”.</p>` : ""}
+    </fieldset>
+    <div class="field" style="margin-top:10px"><label for="target-list">Targets (comma-separated)</label><input id="target-list" data-testid="target-name" data-form="prog" data-field="targets" value="${esc(v.targets)}"></div>
+    <div class="row" style="margin-top:10px"><button class="btn primary" data-act="saveProgram" ${+v.n > +v.m || !v.name.trim() ? "disabled" : ""} data-testid="publish-plan-btn">Save program</button><span class="tiny muted">Writes programs + program_versions + targets + audit_logs</span></div>`}`, navBcba(1));
+  },
+  verify: ["The rule fields produce a sentence a parent could understand", "An impossible rule (3 of the last 2) is blocked", "Undo works across every field", "Saving creates a version 1 row, so later edits keep their history"],
+  decisions: [["D8", "Structured mastery rule. Are N-of-M plus minimum trials enough for the clinical team, or are other rule shapes needed?"]],
+  spec: "BCBA-003 · BCBA-004 · FR-3.1 · FR-3.4", },
+
+{ id: "assign", act: "BCBA planning", title: "Assign RBTs, with history",
+  lede: "Priya assigns Sam (created in step 4) to Dee alongside Jordan. Assignments are rows with start and end dates, so “who could see Dee's data in March?” has an answer.",
+  enter() { ensureSam(); },
+  render() {
+    const rows = DB.staff_assignments.filter(a => a.student_id === "s_dee");
+    const rbts = DB.users.filter(u => u.role === "rbt");
+    return web("/bcba/students/dee", "u_bcba", `<h3 style="font-size:18px">Dee K. › Team</h3>
+    <div class="card" style="margin-top:10px" data-testid="assign-rbts-section"><b>Assigned RBTs</b>
+      <div style="margin-top:6px;display:flex;flex-direction:column;gap:6px" data-testid="assigned-rbt-list">${rbts.map(u => { const a = rows.find(r => r.user_id === u.id && !r.to);
+        return `<div class="row"><span class="avatar">${initials(u.name)}</span><span>${esc(u.name)}</span>${a ? `<span class="pill ok">Assigned</span><button class="btn sm" data-act="unassign" data-arg="${u.id}" data-testid="remove-rbt-btn">Remove</button>` : `<button class="btn sm primary" data-act="assign" data-arg="${u.id}">Assign</button>`}</div>`; }).join("")}</div></div>
+    <div class="tscroll" style="margin-top:12px"><table class="t"><tr><th>RBT</th><th>From</th><th>To</th><th>By</th></tr>${rows.map(r => `<tr><td>${esc(user(r.user_id).name)}</td><td>${fmtDate(r.from)}</td><td>${r.to ? fmtDate(r.to) : "—"}</td><td>${esc(user(r.by).name)}</td></tr>`).join("")}</table></div>`, navBcba(0));
+  },
+  verify: ["Assigning or removing adds a history row instead of overwriting one", "Removing a person ends their access, but their past data keeps their name", "Assign Sam now: the next steps rely on Sam being on Dee's team"],
+  decisions: [],
+  spec: "BCBA-005 · FR-2.2 · REVIEW §4.4", },
+
+/* ---------------- RBT ---------------- */
+{ id: "start", act: "RBT session", title: "Start a session on the phone",
+  lede: "Jordan opens the app and taps Dee. Starting the session claims the lock for Dee, so only one phone records her session at a time. Every program for Dee is available inside one session.",
+  enter() { S.actor = "u_rbt"; ensureSam(); ensureNewProgram(); if (!DB.staff_assignments.some(a => a.student_id === "s_dee" && a.user_id === "u_sam" && !a.to)) insert("staff_assignments", { id: uid("sa_"), student_id: "s_dee", user_id: "u_sam", from: Date.now(), to: null, by: "u_bcba" }); },
+  render() {
+    const d = S.devices.A;
+    const inner = d.view === "list" ? mobileScreen("A", { only: "s_dee" }) : mobileScreen("A");
+    return `<div class="phones">${phone("A", inner)}<div class="card" style="flex:1 1 220px;min-width:0"><b>What the server holds</b><div class="tiny" style="margin-top:6px">${(() => { const l = DB.session_locks.find(x => x.student_id === "s_dee"); return l ? `Lock on Dee K.<br>holder: <b>${esc(user(l.user_id).name)}</b><br>device: <span class="mono">${l.device_id}</span><br>epoch: <b class="mono">${l.epoch}</b><br>acquired: ${fmtTime(l.acquired_at)}` : "No lock on Dee K. yet. Tap Dee on the phone."; })()}</div></div></div>`;
+  },
+  verify: ["Tapping Dee starts a session and a lock row appears (session_locks +1)", "Fewer than 3 taps from home to recording", "All of Dee's programs, including the one built in step 7, are reachable as tabs"],
+  decisions: [["D2", "One lock per student (shown). The current mockups lock per program."]],
+  spec: "RBT-001 · RBT-002 · RBT-003", },
+
+{ id: "trial", act: "RBT session", title: "Record discrete trials",
+  lede: "Jordan runs the colors program. Each tap saves to the phone first, then to the server, and the receipt counts what the server confirmed. Void last marks a tap as a mistake instead of deleting it, and Restore brings it back.",
+  enter() { ensureSession("A"); S.devices.A.tab = S.ui.newProgram; },
+  render() { return `<div class="phones">${phone("A", mobileScreen("A"))}<div class="card" style="flex:1 1 220px;min-width:0"><b>Try this</b><ol class="tiny" style="padding-left:18px;margin:6px 0"><li>Record 6–8 trials with a mix of buttons.</li><li>Tap <b>Void last</b>. The mark stays in the history, struck through.</li><li>Tap <b>Restore</b>.</li><li>Watch <b>observations</b> in the database panel: a void adds a row and never removes one.</li></ol></div></div>`; },
+  verify: ["Four outcome buttons, large and labelled with text and symbol, not color alone", "The trial counter and % independent are shown separately", "Void last works and leaves a visible trace", "The receipt reaches N/N while online"],
+  decisions: [["D13", "Undo on data entry is Void last (append-only), not delete."], ["D9", "Prompted counts as not independent in the %."]],
+  spec: "RBT-006 · FR-4.2 · trial-recording.yaml", },
+
+{ id: "freqdur", act: "RBT session", title: "Count behaviors and time episodes",
+  lede: "In the same session Jordan switches to Requesting help (frequency) and Tantrum (duration). Tap to count; start and stop to time an episode. Rate per minute uses the session's elapsed time.",
+  enter() { ensureSession("A"); const s = DB.sessions.find(x => x.id === S.devices.A.session); if (S.devices.A.tab === S.ui.newProgram) S.devices.A.tab = s.program_ids.find(id => program(id).method === "frequency"); },
+  render() { return `<div class="phones">${phone("A", mobileScreen("A"))}<div class="card" style="flex:1 1 220px;min-width:0"><b>Try this</b><ol class="tiny" style="padding-left:18px;margin:6px 0"><li>On <b>Requesting help</b>, tap the counter a few times.</li><li>Switch to <b>Tantrum</b>, start an episode, wait a few seconds, then stop it.</li><li>Void last works on these too.</li></ol></div></div>`; },
+  verify: ["Switching programs mid-session keeps each program's counts separate", "The duration timer runs in real time and episodes list with a total", "Nothing resets the counter in one tap"],
+  decisions: [["D7", "Inactivity timeout shouldn't end a running timer. Shown in the next step."]],
+  spec: "RBT-004 · RBT-005 · FR-4.3 · FR-4.4", },
+
+/* ---------------- Offline & handoff ---------------- */
+{ id: "offline", act: "Offline & handoff", title: "Lose Wi-Fi and keep working",
+  lede: "Jordan walks to the playground and the Wi-Fi drops. Recording carries on. The outbox counts what's waiting and the receipt shows the server hasn't confirmed it yet. Then Jordan puts the phone down for a while.",
+  enter() { ensureSession("A"); },
+  render() {
+    const d = S.devices.A;
+    return `<div class="phones">${phone("A", mobileScreen("A"))}<div class="card" style="flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:8px"><b>Controls</b>
+      <button class="btn ${d.online ? "" : "primary"}" data-act="toggleWifi" data-arg="A">${d.online ? "Turn Wi-Fi off" : "Wi-Fi is off. Turn it back on"}</button>
+      <button class="btn" data-act="idle" data-arg="A">Simulate 15 minutes idle</button>
+      <p class="tiny muted">Idle locks the phone to a PIN screen. It doesn't sign out, so the running timer and unsent data are safe. Leave Wi-Fi <b>off</b> for the next step.</p></div></div>`;
+  },
+  verify: ["Recording works with Wi-Fi off and the waiting count rises", "The receipt shows confirmed < recorded while offline", "Idle locks the screen with a PIN instead of signing out"],
+  decisions: [["D4", "Sessions can start offline with a provisional lock."], ["D5", "Offline limit (72h shown in REVIEW), then a full sign-in is required."], ["D6", "On-device storage must be encrypted. The answer “key-value” would store PHI in plain text."], ["D7", "PIN lock instead of logout during a session."]],
+  spec: "RBT-010 · FR-5.1 · COMMON-005 · ADR-001", },
+
+{ id: "takeover", act: "Offline & handoff", title: "A colleague takes over",
+  lede: "Jordan's phone is still offline. Sam arrives to cover Dee's afternoon and taps Dee. The server still shows Jordan as the holder, so Sam sees a warning and takes over. Jordan doesn't know yet and keeps recording.",
+  enter() { ensureSession("A"); ensureSam(); if (S.devices.A.online) { S.devices.A.online = false; } S.devices.B.user = "u_sam"; if (!DB.devices.some(x => x.id === "dev_sam")) insert("devices", { id: "dev_sam", user_id: "u_sam", label: "Sam's phone", last_sync: Date.now() }); },
+  render() {
+    return `<div class="phones">${phone("A", mobileScreen("A"), "Jordan's phone (offline)")}${phone("B", mobileScreen("B", { only: "s_dee" }), "Sam's phone (online)")}</div>
+    <p class="tiny muted" style="margin-top:10px">Order: on Sam's phone tap Dee → Take over. Then record a few more trials or events on Jordan's offline phone.</p>`;
+  },
+  verify: ["Sam is told who holds the session and how long since that phone was heard from", "The warning says what happens to the other person's data", "After taking over, session_locks shows epoch 2 for Sam", "Jordan's offline phone can still record (it can't know yet)"],
+  decisions: [["D3", "Data recorded without the lock is kept and reviewed, never discarded or merged silently."], ["D2", "Should anyone assigned be able to take over, or only BCBA/Admin? The answer was “anyone with access”."]],
+  spec: "RBT-011 · 02_clarifying Q12 · 03_phase1 Q7", },
+
+{ id: "sync", act: "Offline & handoff", title: "Reconnect and sync",
+  lede: "Jordan's Wi-Fi comes back. The phone uploads everything in order. The server keeps every observation: anything recorded before Sam took over counts normally, and anything after goes to Priya's review queue. Jordan's phone now explains what happened.",
+  enter() { ensureSession("A"); },
+  render() {
+    const d = S.devices.A;
+    return `<div class="phones">${phone("A", mobileScreen("A"), "Jordan's phone")}${phone("B", mobileScreen("B"), "Sam's phone")}</div>
+    <div class="row" style="margin-top:10px"><button class="btn ${d.online ? "" : "primary"}" data-act="toggleWifi" data-arg="A">${d.online ? "Jordan is online" : "Turn Jordan's Wi-Fi on"}</button><span class="tiny muted">Then look at review_items and observations in the database panel.</span></div>`;
+  },
+  verify: ["Nothing recorded offline is lost: Server confirmed N/N", "Observations after the takeover are marked “awaiting BCBA review”", "Jordan sees a clear banner naming Sam and the time", "Taking the session back is possible, but it goes through the same takeover"],
+  decisions: [["D3", "Review queue instead of drafts, discard, or timestamp merge."]],
+  spec: "RBT-010 · RBT-011 · screen-flows: Offline Sync / Lock flows · REVIEW §4.3", },
+
+{ id: "end", act: "Offline & handoff", title: "End the session and see the graph",
+  lede: "Sam finishes the session. The summary shows what was recorded and what's waiting for review. Saving releases the lock, and a quick graph gives Sam immediate feedback.",
+  enter() { ensureSession("B", true); },
+  render() { return `<div class="phones">${phone("B", mobileScreen("B"), "Sam's phone")}<div class="card" style="flex:1 1 220px;min-width:0"><b>Try this</b><ol class="tiny" style="padding-left:18px;margin:6px 0"><li>Record a couple more items as Sam if you like.</li><li>Tap <b>End session</b>, add a note, then <b>Confirm &amp; save</b>.</li><li>The quick graph opens with today's point highlighted.</li></ol></div></div>`; },
+  verify: ["The summary lists every program with its count and how many items are in review", "Confirm releases the lock (session_locks −1)", "The quick graph highlights today's session"],
+  decisions: [],
+  spec: "RBT-007 · RBT-008 · RBT-009", },
+
+/* ---------------- Review & analysis ---------------- */
+{ id: "review", act: "Review & analysis", title: "Review data recorded without the lock",
+  lede: "Priya sees one review item: observations Jordan recorded after Sam took over. She can accept them (they count in graphs) or reject them with a reason (kept, but hidden). Either way the decision is audited.",
+  enter() { S.actor = "u_bcba"; ensureReviewItem(); },
+  render() {
+    const items = DB.review_items;
+    const f = formHist("reject", { reason: "" });
+    return web("/bcba/review", "u_bcba", `<h3 style="font-size:18px">Review queue</h3>
+    ${items.length ? items.map(it => { const obs = DB.observations.filter(o => o.session_id === it.session_id && o.device_id === it.device_id && ["pending", "accepted", "rejected"].includes(o.review_state));
+      const byProg = {}; obs.forEach(o => { if (o.kind === "void") return; (byProg[o.program_id] = byProg[o.program_id] || []).push(o); });
+      return `<div class="card" style="margin-top:10px"><div class="row"><b>${esc(student(it.student_id).name)} · ${fmtDate(it.created_at)}</b><span class="pill ${it.status === "open" ? "warn" : it.status === "accepted" ? "ok" : "neutral"}">${it.status}</span></div>
+      <p class="tiny">${esc(user(it.user_id).name)} recorded <b>${it.count}</b> observations on <span class="mono">${it.device_id}</span> after the session moved to ${esc(user(DB.session_locks.find(l => l.session_id === it.session_id)?.user_id || "u_sam").name)}.</p>
+      <div class="tscroll"><table class="t"><tr><th>Program</th><th>Observations</th><th>Recorded</th></tr>${Object.entries(byProg).map(([pid, list]) => `<tr><td>${esc(program(pid).name)}</td><td class="mono">${list.map(o => o.kind === "trial" ? ({ correct: "✓", incorrect: "✗", prompted: "◐", no_response: "○" }[o.value]) : o.kind === "event" ? "+1" : mmss(o.value)).join(" ")}</td><td class="tiny">${fmtTime(list[0].recorded_at)}–${fmtTime(list[list.length - 1].recorded_at)}</td></tr>`).join("")}</table></div>
+      ${it.status === "open" ? `<div class="row" style="margin-top:8px"><button class="btn primary" data-act="reviewAccept" data-arg="${it.id}">Accept into graphs</button><input aria-label="Reason for rejecting" style="flex:1 1 180px;border:1px solid var(--rule-strong);border-radius:6px;padding:6px" placeholder="Reason (required to reject)" data-form="reject" data-field="reason" value="${esc(f.vals.reason)}"><button class="btn danger" data-act="reviewReject" data-arg="${it.id}" ${f.vals.reason.trim() ? "" : "disabled"}>Reject</button></div>` : `<p class="tiny muted">Decided by ${esc(user(it.decided_by).name)} at ${fmtTime(it.decided_at)}${it.reason ? `: “${esc(it.reason)}”` : ""}.</p>`}</div>`; }).join("") : `<p class="muted">Nothing to review.</p>`}`, navBcba(3));
+  },
+  verify: ["The queue explains who recorded what, on which device, and why it's here", "Reject needs a reason; accept doesn't", "Either decision leaves the observations in the database (row count unchanged)"],
+  decisions: [["D3", "Confirm the BCBA, not the RBT, makes this call."]],
+  spec: "REVIEW §4.3 (new)", },
+
+{ id: "graphs", act: "Review & analysis", title: "Read the graphs and mark a phase change",
+  lede: "Line graphs for skills, bar charts for behavior counts. Phase lines sit between sessions and the data path breaks at each one, following ABA graphing convention. Add a phase marker and watch the flag recalculate for the new phase.",
+  enter() { S.actor = "u_bcba"; if (!S.ui.gStudent) { S.ui.gStudent = "s_ava"; S.ui.gProg = "p_ava_rid"; } },
+  render() {
+    const sid = S.ui.gStudent, pid = S.ui.gProg, p = program(pid); const st = programStatus(pid); const rows = series(pid);
+    const bar = S.ui.gBar ?? (p.method !== "trial");
+    return web("/bcba/graphs", "u_bcba", `<div class="row" style="gap:10px">
+      <div class="field" style="flex:1 1 140px"><label for="g-st">Student</label><select id="g-st" data-ui="gStudent">${DB.students.map(s => `<option value="${s.id}" ${s.id === sid ? "selected" : ""}>${esc(s.name)}</option>`).join("")}</select></div>
+      <div class="field" style="flex:2 1 200px"><label for="g-pr">Program</label><select id="g-pr" data-testid="graph-program-select" data-ui="gProg">${DB.programs.filter(x => x.student_id === sid).map(x => `<option value="${x.id}" ${x.id === pid ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></div>
+      <div class="row" style="align-self:flex-end"><button class="btn sm ${!bar ? "primary" : ""}" data-act="gType" data-arg="line">Line</button><button class="btn sm ${bar ? "primary" : ""}" data-act="gType" data-arg="bar">Bar</button></div></div>
+    <div class="row" style="margin:10px 0 4px"><b>${esc(p.name)}</b>${studentChip(st)}<span class="tiny muted" style="min-width:0">${esc(st.why)}</span></div>
+    <div data-testid="${bar ? "bar-chart" : "line-graph"}" class="tscroll">${chartSVG(pid, { bar })}</div>
+    <div class="card" style="margin-top:10px" data-testid="phase-markers"><b>Add phase marker</b>
+      <div class="grid2" style="margin-top:6px"><div class="field"><label for="ph-before">Starts before session</label><select id="ph-before" data-ui="phBefore">${rows.map((r, i) => `<option value="${r.session.id}" ${S.ui.phBefore === r.session.id || (!S.ui.phBefore && i === rows.length - 3) ? "selected" : ""}>${fmtDate(r.t)} (#${i + 1})</option>`).join("")}</select></div>
+      <div class="field"><label for="phase-name">Phase name</label><input id="phase-name" data-testid="phase-name" data-ui="phName" value="${esc(S.ui.phName ?? "Added visual schedule")}"></div></div>
+      <button class="btn sm primary" style="margin-top:8px" data-act="addPhase" data-testid="add-phase-marker-btn">Add marker</button></div>
+    <div class="tscroll" style="margin-top:10px"><table class="t" data-testid="graph-legend"><tr><th>Phase</th><th class="num">Sessions</th><th class="num">Mean</th><th class="num">Trend / wk</th></tr>${phasesFor(pid).map(ph => { const r = rows.filter(x => x.phase === ph); const mean = r.length ? r.reduce((a, x) => a + x.value, 0) / r.length : 0;
+      return `<tr><td>${esc(ph.label)}</td><td class="num">${r.length}</td><td class="num">${r.length ? (Math.round(mean * 10) / 10) + (p.method === "trial" ? "%" : "") : "—"}</td><td class="num">${r.length > 1 ? slopePerWeek(r).toFixed(1) : "—"}</td></tr>`; }).join("")}</table></div>`, navBcba(2));
+  },
+  verify: ["Ava (Receptive ID) shows three phases and reads as Mastered", "Ben (Tacting) reads No progress and Cal reads Regression; open each", "The data path does not cross phase lines", "Adding a marker changes the phase table and may change the flag"],
+  decisions: [["D8", "Flags use the rules in REVIEW §4.7. The clinical team should confirm the thresholds."]],
+  spec: "BCBA-006 · BCBA-007 · FR-6.1–6.4 · 04-data-visualization.md", },
+
+{ id: "correct", act: "Review & analysis", title: "Correct a past session",
+  lede: "Priya notices a session where Ben's mand count was entered short. She corrects it with a reason. The original stays in the record, the graph point turns orange, and the audit log records the before and after values.",
+  enter() { S.actor = "u_bcba"; },
+  render() {
+    const pid = "p_ben_mand"; const rows = series(pid).slice(-8); const sel = S.ui.corrSession || rows[rows.length - 3]?.session.id;
+    const f = formHist("corr", { value: "", reason: "" });
+    const target = rows.find(r => r.session.id === sel);
+    return web("/bcba/students/ben/data", "u_bcba", `<h3 style="font-size:18px">Ben T. › Manding (requests) › Recent sessions</h3>
+    <div class="tscroll"><table class="t" style="margin-top:8px"><tr><th>Date</th><th class="num">Count</th><th></th></tr>${rows.map(r => `<tr class="${r.session.id === sel ? "flash" : ""}"><td>${fmtDate(r.t)} ${fmtTime(r.t)}</td><td class="num">${r.corrected ? `<s class="muted">${r.original}</s> ${r.value}` : r.value}</td><td><button class="btn sm" data-act="pickCorr" data-arg="${r.session.id}">Edit</button></td></tr>`).join("")}</table></div>
+    ${target ? `<div class="card" style="margin-top:10px"><div class="row"><b>Correct ${fmtDate(target.t)}</b>${undoBar("corr")}</div><div class="grid2" style="margin-top:6px"><div class="field"><label for="corr-val">New count (currently ${target.value})</label><input id="corr-val" type="number" min="0" data-form="corr" data-field="value" value="${esc(f.vals.value)}" placeholder="${target.value + 2}"></div><div class="field"><label for="corr-reason">Reason (required)</label><input id="corr-reason" data-form="corr" data-field="reason" value="${esc(f.vals.reason)}" placeholder="Paper backup sheet shows 2 more mands"></div></div>
+    <button class="btn primary" style="margin-top:8px" data-act="saveCorr" data-arg="${target.session.id}" ${f.vals.value !== "" && f.vals.reason.trim() ? "" : "disabled"}>Save correction</button></div>` : ""}
+    <div style="margin-top:10px">${chartSVG(pid, { last: 12, h: 200 })}</div>`, navBcba(2));
+  },
+  verify: ["A reason is required", "The old value stays visible (struck through) next to the new one", "The corrected point is visually distinct on the graph", "corrections +1 and audit_logs +1; observations unchanged"],
+  decisions: [["D14", "Only the BCBA can correct past data in Phase 1, with a required reason. Should RBTs correct their own same-day entries?"]],
+  spec: "BCBA-009 · FR-1.3", },
+
+{ id: "report", act: "Review & analysis", title: "Generate a progress report",
+  lede: "Priya builds Ava's progress report. It runs as a background job and the result previews here; in the product it downloads as a PDF. Every number in it comes from the same calculations as the graphs.",
+  enter() { S.actor = "u_bcba"; },
+  render() {
+    const r = S.ui.report; const progs = DB.programs.filter(p => p.student_id === "s_ava");
+    return web("/bcba/reports", "u_bcba", `<div class="card"><b>Progress report</b><div class="grid2" style="margin-top:6px"><div class="field"><label for="rep-st">Student</label><select id="rep-st" disabled><option>Ava M.</option></select></div><div class="field"><label for="rep-range">Date range</label><select id="rep-range" data-testid="report-date-range"><option>Last 30 days</option><option>This term</option></select></div></div>
+      <div class="tiny" style="margin-top:6px" data-testid="report-programs">${progs.map(p => `<label style="margin-right:12px"><input type="checkbox" checked disabled> ${esc(p.name)}</label>`).join("")}</div>
+      <div class="row" style="margin-top:8px"><button class="btn primary" data-act="genReport" data-testid="generate-pdf-btn" ${r && r.state === "running" ? "disabled" : ""}>Generate report</button>${r ? `<span class="tiny" data-testid="report-progress">${r.state === "running" ? "Generating… job " + r.id : "Ready · job " + r.id}</span>` : ""}</div></div>
+    ${r && r.state === "done" ? `<div class="report" style="margin-top:14px"><div class="tiny" style="color:#5B6661">${S.env === "prod" ? "" : "DEMO DATA · NOT A REAL STUDENT · "}Generated ${fmtStamp(r.at)} by Priya Nair, BCBA</div><h3 style="margin:6px 0">Progress Report: Ava M.</h3><p style="font-size:14px">Grade 2 · 2026–27 Treatment Plan · ${series("p_ava_rid").length} sessions in range</p>
+      ${progs.map(p => { const st = programStatus(p.id); const rows = series(p.id); const last = rows.slice(-3); return `<h4 style="font-family:var(--f-display);margin:14px 0 4px">${esc(p.name)} · <span class="pill ${st.tone}">${st.label}</span></h4><p style="font-size:13.5px;margin:0 0 6px">${esc(st.why)} Last three sessions: ${last.map(x => x.value + "%").join(", ")}.</p>${chartSVG(p.id, { h: 190 })}`; }).join("")}
+      <h4 style="font-family:var(--f-display);margin:14px 0 4px">BCBA comments</h4><p style="font-size:13.5px;color:#5B6661">[Free text written by the BCBA before release.]</p></div>` : ""}`, navBcba(4));
+  },
+  verify: ["The report states its data range, author and generation time", "Status text matches the graph page exactly", "Demo reports are watermarked as demo data"],
+  decisions: [],
+  spec: "BCBA-008 · FR-7.1 · architecture: Report Generation Flow", },
+
+/* ---------------- Close-out ---------------- */
+{ id: "audit", act: "Close-out", title: "Audit trail and sign-off summary",
+  lede: "Everything done in this walkthrough is in the audit log, with who did it and in which environment. Below that is the sign-off summary for all 20 steps. Copy it into the decision log.",
+  enter() { S.actor = "u_admin"; },
+  render() {
+    const logs = DB.audit_logs.slice().reverse();
+    return web("/admin/audit", "u_admin", `<div class="tscroll" style="max-height:300px;overflow:auto"><table class="t"><tr><th>Time</th><th>User</th><th>Action</th><th>Resource</th><th>Detail</th></tr>${logs.map(l => `<tr><td class="mono tiny">${fmtTime(l.at)}</td><td>${esc(l.user_id === "system" ? "system" : user(l.user_id)?.name)}</td><td class="mono tiny">${esc(l.action)}</td><td class="mono tiny">${esc(l.resource)}</td><td class="tiny">${esc(l.detail)}</td></tr>`).join("")}</table></div>
+    <div class="card" style="margin-top:14px"><div class="row"><b>Sign-off summary</b><button class="btn sm" data-act="copySummary" style="margin-left:auto">Copy as Markdown</button></div>
+    <div class="tscroll"><table class="t" style="margin-top:6px"><tr><th>#</th><th>Step</th><th>You</th><th>All reviewers</th></tr>${STEPS.map((s, i) => { const mine = SO.mine[s.id]; const agg = aggregate(s.id); return `<tr><td class="mono">${i + 1}</td><td>${esc(s.title)}</td><td>${mine ? verdictPill(mine.v) : "—"}</td><td class="tiny">${agg || "—"}</td></tr>`; }).join("")}</table></div>
+    <textarea id="summary-md" rows="4" class="mono tiny" style="width:100%;margin-top:8px" readonly hidden></textarea></div>`, navAdmin(3));
+  },
+  verify: ["Every write you made shows up here", "Entries record the environment (demo)", "Your sign-offs are complete, with notes on anything marked Concern or Fail"],
+  decisions: [],
+  spec: "FR-1.3 · ADMIN audit (US-303)", },
+];
+
+/* helpers that let any step be visited directly */
+function ensureSam() {
+  if (!DB.users.some(u => u.id === "u_sam")) {
+    insert("users", { id: "u_sam", name: "Sam Ortiz", role: "rbt", email: DB.users.some(u => u.email === "s.ortiz@demo.example.org") ? "sam.ortiz@demo.example.org" : "s.ortiz@demo.example.org", active: true, must_change_pw: false, created_at: Date.now() });
+    audit("user_created", "user:u_sam", "Sam Ortiz (RBT) · auto-created because step 4 was skipped");
+  }
+}
+function ensureNewProgram() {
+  if (S.ui.newProgram && program(S.ui.newProgram)) return;
+  const id = "p_dee_colors"; if (!program(id)) {
+    insert("programs", { id, student_id: "s_dee", plan_id: "tp_s_dee", name: "Receptive ID — Colors", method: "trial", goal: "acquire", version: 1, active: true, mastery: { threshold: 80, n: 3, m: 3, minTrials: 10, promptedCounts: "not_independent" }, created_at: Date.now() });
+    insert("program_versions", { id: uid("pv_"), program_id: id, version: 1, at: Date.now(), by: "u_bcba", reason: "Initial version" });
+    ["Red", "Blue", "Yellow"].forEach((sd, i) => insert("targets", { id: `${id}_t${i}`, program_id: id, sd, order: i, active: true }));
+    insert("phases", { id: uid("ph_"), program_id: id, label: "Baseline", kind: "baseline", start_at: Date.now() - MIN, by: "u_bcba" });
+  }
+  S.ui.newProgram = id;
+}
+function ensureSession(dk, forB) {
+  ensureSam(); ensureNewProgram();
+  const d = S.devices[dk];
+  if (forB) { S.devices.B.user = "u_sam"; if (!d.session) { acquireLock("B", "s_dee", true); } if (d.view === "list" || d.view === "held") d.view = "collect"; return; }
+  if (!d.session) { const r = acquireLock(dk, "s_dee", true); void r; }
+}
+function ensureReviewItem() {
+  if (DB.review_items.length) return;
+  // visitor skipped the handoff steps: simulate them so the queue has an example
+  ensureSession("A"); const A = S.devices.A; A.online = false;
+  const sess = DB.sessions.find(s => s.id === A.session);
+  const pid = sess.program_ids.find(id => program(id).method === "trial");
+  S.devices.B.user = "u_sam"; acquireLock("B", "s_dee", true);
+  ["correct", "prompted", "correct"].forEach(v => deviceRecord("A", { program_id: pid, kind: "trial", value: v, target_id: DB.targets.find(t => t.program_id === pid).id, recorded_at: Date.now() + 1000 }));
+  A.online = true; flush("A");
+}
+
+/* ============================================================
+   Actions
+   ============================================================ */
+const A = {
+  next() { go(S.step + 1); }, prev() { go(S.step - 1); },
+  goto(i) { go(+i); },
+  noop() { toast("Metrics refreshed"); },
+  resetAll() { if (!S.ui.confirmAll) { S.ui.confirmAll = true; $("#reset-btn").textContent = "Click again to reset"; setTimeout(() => { S.ui.confirmAll = false; $("#reset-btn").textContent = "Reset walkthrough"; }, 3000); return false; } boot(); toast("Walkthrough reset with fresh demo data"); return false; },
+  setEnv(e) { S.env = e; audit("env_switched", "config", "ENV=" + e + " (walkthrough only)"); },
+  loginSubmit() { S.ui.pwStage = true; audit("login_success", "user:u_admin", "temporary password; change required"); },
+  pwSubmit() { S.loggedIn = true; user("u_admin").must_change_pw = false; touch("users"); audit("password_changed", "user:u_admin", "first sign-in"); },
+  tourNext() { S.tour++; }, tourPrev() { S.tour = Math.max(0, S.tour - 1); }, tourSkip() { S.tour = 99; }, tourRestart() { S.tour = 0; },
+  formUndo(k) { const f = S.forms[k]; if (!f.undo.length) return; f.redo.push(structuredClone(f.vals)); f.vals = f.undo.pop(); toast("Undone"); },
+  formRedo(k) { const f = S.forms[k]; if (!f.redo.length) return; f.undo.push(structuredClone(f.vals)); f.vals = f.redo.pop(); toast("Redone"); },
+  createUser() {
+    const v = S.forms.newuser.vals; const id = v.email === "s.ortiz@demo.example.org" ? "u_sam" : uid("u_");
+    const pw = Array.from({ length: 4 }, () => "abcdefghjkmnpqrstuvwxyz23456789"[Math.floor(Math.random() * 31)]).join("") + "-" + Math.floor(1000 + Math.random() * 9000);
+    const name = `${v.first.trim()} ${v.last.trim()}`;
+    insert("users", { id, name, role: v.role, email: v.email.trim(), active: true, must_change_pw: true, created_at: Date.now() });
+    audit("user_created", "user:" + id, `${name} (${v.role.toUpperCase()})`);
+    S.ui.createdTemp = { name, pw }; delete S.forms.newuser; formHist("newuser", { first: "", last: "", email: "", role: "rbt" });
+  },
+  copyTemp() { const t = S.ui.createdTemp?.pw; navigator.clipboard?.writeText(t).then(() => toast("Copied"), () => toast("Select the password and copy it")); return false; },
+  canary() { const w = 2 + Math.floor(Math.random() * 4), r = 1 + Math.floor(Math.random() * 3), d = 1 + Math.floor(Math.random() * 3); S.ui.canary = { w, r, d }; audit("health_probe", "database", `write ${w}ms · read ${r}ms · delete ${d}ms · PASS`); },
+  askResetDemo() { S.ui.confirmReset = true; setTimeout(() => { if (S.ui.confirmReset) { S.ui.confirmReset = false; render(); } }, 4000); },
+  resetDemo() { if (S.env === "prod") { toast("Refused: not available in Production"); return; } const keepStep = S.step, env = S.env; boot(); S.step = keepStep; S.env = env; audit("demo_data_reset", "database", "wiped and reseeded"); toast("Demo data reset"); },
+  saveProgram() {
+    const v = S.forms.prog.vals; const id = "p_dee_colors";
+    if (program(id)) { DB.programs = DB.programs.filter(p => p.id !== id); DB.targets = DB.targets.filter(t => t.program_id !== id); DB.phases = DB.phases.filter(p => p.program_id !== id); }
+    insert("programs", { id, student_id: "s_dee", plan_id: "tp_s_dee", name: v.name.trim(), method: v.method, goal: "acquire", version: 1, active: true, mastery: v.method === "trial" ? { threshold: +v.threshold, n: +v.n, m: +v.m, minTrials: +v.minTrials, promptedCounts: "not_independent" } : null, created_at: Date.now() });
+    insert("program_versions", { id: uid("pv_"), program_id: id, version: 1, at: Date.now(), by: "u_bcba", reason: "Initial version" });
+    v.targets.split(",").map(s => s.trim()).filter(Boolean).forEach((sd, i) => insert("targets", { id: `${id}_t${i}`, program_id: id, sd, order: i, active: true }));
+    insert("phases", { id: uid("ph_"), program_id: id, label: "Baseline", kind: "baseline", start_at: Date.now() - MIN, by: "u_bcba" });
+    audit("program_created", "program:" + id, `${v.name} v1 · mastery ≥${v.threshold}% ${v.n}/${v.m} · min ${v.minTrials} trials`);
+    S.ui.newProgram = id; delete S.forms.prog;
+  },
+  assign(uid_) { insert("staff_assignments", { id: uid("sa_"), student_id: "s_dee", user_id: uid_, from: Date.now(), to: null, by: "u_bcba" }); audit("rbt_assigned", "student:s_dee", user(uid_).name); },
+  unassign(uid_) { const a = DB.staff_assignments.find(r => r.student_id === "s_dee" && r.user_id === uid_ && !r.to); a.to = Date.now(); touch("staff_assignments"); audit("rbt_unassigned", "student:s_dee", user(uid_).name); },
+  mPick(arg) { const [dk, sid] = arg.split(":"); const d = S.devices[dk]; d.pickStudent = sid; const r = acquireLock(dk, sid, false); if (r.held) d.view = "held"; },
+  mBack(dk) { S.devices[dk].view = "list"; },
+  mTakeover(dk) { const d = S.devices[dk]; acquireLock(dk, d.pickStudent, true); const other = Object.entries(S.devices).find(([k, x]) => k !== dk && x.session === d.session); if (other) other[1].takeoverAt = Date.now(); },
+  mTakeback(dk) { const d = S.devices[dk]; const sess = DB.sessions.find(s => s.id === d.session); d.pickStudent = sess.student_id; d.view = "held"; },
+  mTab(arg) { const [dk, pid] = arg.split(":"); S.devices[dk].tab = pid; },
+  mTrial(arg) { const [dk, v] = arg.split(":"); const d = S.devices[dk]; const pid = d.tab; const tgs = DB.targets.filter(t => t.program_id === pid && t.active);
+    const voided = activeVoids(d.local); const n = d.local.filter(o => o.session_id === d.session && o.program_id === pid && o.kind === "trial" && !voided.has(o.id)).length;
+    deviceRecord(dk, { program_id: pid, kind: "trial", value: v, target_id: tgs[n % tgs.length]?.id }); d.redo = []; },
+  mEvent(dk) { const d = S.devices[dk]; deviceRecord(dk, { program_id: d.tab, kind: "event", value: 1 }); d.redo = []; },
+  mDur(dk) { const d = S.devices[dk]; if (d.running && d.running.pid === d.tab) { const sec = Math.max(1, Math.round((Date.now() - d.running.start) / 1000)); deviceRecord(dk, { program_id: d.tab, kind: "duration", value: sec }); d.running = null; d.redo = []; } else d.running = { pid: d.tab, start: Date.now() }; },
+  mVoid(dk) { const d = S.devices[dk]; const voided = activeVoids(d.local);
+    const last = d.local.filter(o => o.session_id === d.session && o.program_id === d.tab && o.kind !== "void" && !voided.has(o.id)).pop(); if (!last) return;
+    const v = deviceRecord(dk, { program_id: d.tab, kind: "void", ref_id: last.id }); d.redo.push(v.id); toast("Marked as a mistake. Still in the record."); },
+  mRedo(dk) { const d = S.devices[dk]; const vid = d.redo.pop(); const v = d.local.find(o => o.id === vid); if (!v) return; deviceRecord(dk, { program_id: v.program_id, kind: "void", ref_id: v.id }); toast("Restored"); },
+  // restoring = voiding the void
+  mEnd(dk) { S.devices[dk].view = "summary"; },
+  mResume(dk) { S.devices[dk].view = "collect"; },
+  mConfirmEnd(dk) { const d = S.devices[dk]; flush(dk); const sess = DB.sessions.find(s => s.id === d.session); sess.status = "completed"; sess.end = Date.now(); sess.notes = S.forms["endnote_" + dk]?.vals.note || ""; touch("sessions");
+    DB.session_locks = DB.session_locks.filter(l => l.session_id !== sess.id); touch("session_locks"); audit("session_completed", "session:" + sess.id, `by ${user(d.user).name} · lock released`);
+    d.lastSession = sess.id; d.view = "graph"; d.graphPid = sess.program_ids.find(id => program(id).method === "frequency") || sess.program_ids[0]; delete S.forms["endnote_" + dk];
+    Object.values(S.devices).forEach(x => { if (x.session === sess.id && x !== d) { x.view = "list"; x.session = null; } }); d.session = sess.id; },
+  mGraphTab(arg) { const [dk, pid] = arg.split(":"); S.devices[dk].graphPid = pid; },
+  mHome(dk) { const d = S.devices[dk]; d.view = "list"; d.session = null; d.epoch = null; },
+  toggleWifi(dk) { const d = S.devices[dk]; d.online = !d.online; if (d.online) { const n = flush(dk); toast(n ? `Synced ${n} item${n === 1 ? "" : "s"}` : "Online"); const ls = lockState(dk); if (ls && !ls.mine) audit("lock_loss_notified", "device:" + d.id, "banner shown to " + user(d.user).name); } },
+  idle(dk) { S.devices[dk].pinLocked = true; S.devices[dk].pin = ""; },
+  pin(arg) { const [dk, k] = arg.split(":"); const d = S.devices[dk]; if (k === "⌫") d.pin = d.pin.slice(0, -1); else if (d.pin.length < 4) d.pin += k; if (d.pin.length === 4) { if (d.pin === "1234") { d.pinLocked = false; toast("Unlocked. Session still running."); } else { d.pin = ""; toast("Wrong PIN. Try 1234."); } } },
+  reviewAccept(id) { const it = DB.review_items.find(x => x.id === id); DB.observations.forEach(o => { if (o.session_id === it.session_id && o.device_id === it.device_id && o.review_state === "pending") o.review_state = "accepted"; }); it.status = "accepted"; it.decided_by = "u_bcba"; it.decided_at = Date.now(); touch("review_items"); touch("observations"); audit("review_accepted", "review:" + id, `${it.count} observations now count`); },
+  reviewReject(id) { const it = DB.review_items.find(x => x.id === id); const reason = S.forms.reject.vals.reason.trim(); DB.observations.forEach(o => { if (o.session_id === it.session_id && o.device_id === it.device_id && o.review_state === "pending") o.review_state = "rejected"; }); it.status = "rejected"; it.reason = reason; it.decided_by = "u_bcba"; it.decided_at = Date.now(); touch("review_items"); audit("review_rejected", "review:" + id, reason); delete S.forms.reject; },
+  gType(t) { S.ui.gBar = t === "bar"; },
+  addPhase() { const pid = S.ui.gProg; const rows = series(pid); const sid = S.ui.phBefore || rows[rows.length - 3]?.session.id; const s = DB.sessions.find(x => x.id === sid); if (!s) return; const label = (S.ui.phName ?? "Added visual schedule").trim() || "New phase";
+    insert("phases", { id: uid("ph_"), program_id: pid, label, kind: "intervention", start_at: s.start - MIN, by: "u_bcba" }); audit("phase_added", "program:" + pid, `“${label}” before ${fmtDate(s.start)}`); },
+  pickCorr(sid) { S.ui.corrSession = sid; delete S.forms.corr; },
+  saveCorr(sid) { const v = S.forms.corr.vals; const before = sessionValue("p_ben_mand", sid).value; insert("corrections", { id: uid("co_"), session_id: sid, program_id: "p_ben_mand", new_value: +v.value, reason: v.reason.trim(), by: "u_bcba", at: Date.now() }); audit("data_corrected", "session:" + sid, `Manding count ${before} → ${v.value}: ${v.reason.trim()}`); delete S.forms.corr; },
+  genReport() { const id = uid("job_"); S.ui.report = { id, state: "running" }; insert("reports", { id, type: "progress", student_id: "s_ava", status: "processing", by: "u_bcba", at: Date.now() }); audit("report_requested", "student:s_ava", "progress · last 30 days");
+    setTimeout(() => { const r = DB.reports.find(x => x.id === id); if (!r) return; r.status = "completed"; touch("reports"); S.ui.report = { id, state: "done", at: Date.now() }; audit("report_completed", "report:" + id, "PDF ready"); render(); }, 1400); },
+  copySummary() { const md = summaryMarkdown(); const ta = $("#summary-md"); navigator.clipboard?.writeText(md).then(() => toast("Copied sign-off summary"), () => { ta.hidden = false; ta.value = md; ta.select(); toast("Select all and copy"); }) ?? (ta.hidden = false, ta.value = md); return false; },
+  verdict(v) { setVerdict(STEPS[S.step].id, v); return false; },
+  saveNote() { const n = $("#so-note").value; setVerdict(STEPS[S.step].id, SO.mine[STEPS[S.step].id]?.v || "concern", n); return false; },
+};
+
+/* ============================================================
+   Sign-off (shared via artifact db when available)
+   ============================================================ */
+const SO = { mine: {}, all: {}, names: {}, db: null, me: null, users: null, mode: "local" };
+const LS_KEY = "aba-walkthrough-signoff";
+function lsGet() { try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch { return {}; } }
+function lsSet(v) { try { localStorage.setItem(LS_KEY, JSON.stringify(v)); } catch { } }
+const verdictPill = (v) => `<span class="pill ${v === "pass" ? "ok" : v === "concern" ? "warn" : "bad"}">${v === "pass" ? "Pass" : v === "concern" ? "Concern" : "Fail"}</span>`;
+function aggregate(stepId) {
+  const c = { pass: 0, concern: 0, fail: 0 }; let any = false;
+  Object.values(SO.all).forEach(doc => { const s = doc?.steps?.[stepId]; if (s) { c[s.v]++; any = true; } });
+  if (!any) return ""; return [c.pass && `${c.pass} pass`, c.concern && `${c.concern} concern`, c.fail && `${c.fail} fail`].filter(Boolean).join(" · ");
+}
+let soWriting = Promise.resolve();
+function setVerdict(stepId, v, note) {
+  const prev = SO.mine[stepId] || {};
+  SO.mine[stepId] = { v, note: note ?? prev.note ?? "", at: Date.now() };
+  if (SO.mode === "shared" && SO.db && SO.me) {
+    const payload = { steps: structuredClone(SO.mine), updated_at: Date.now() };
+    soWriting = soWriting.then(() => SO.db.collection("signoffs").doc(SO.me).set(payload)).catch(() => { toast("Couldn't save to the shared sign-off. Kept in this browser."); lsSet(SO.mine); });
+  } else lsSet(SO.mine);
+  renderNotes(); renderRail();
+}
+async function initShared() {
+  SO.mine = lsGet();
+  try {
+    if (!window.claude?.use) return;
+    const [db, users] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    if (!db || !users) return;
+    const me = await users.id(); if (!me) return;
+    SO.db = db; SO.users = users; SO.me = me; SO.mode = "shared";
+    const own = await db.collection("signoffs").doc(me).get();
+    if (own.exists) SO.mine = Object.assign({}, lsGet(), own.data().steps || {});
+    db.collection("signoffs").onSnapshot(async snap => {
+      SO.all = {}; snap.docs.forEach(d => SO.all[d.id] = d.data());
+      try { const ps = await users.profiles(Object.keys(SO.all)); Object.entries(ps).forEach(([id, p]) => SO.names[id] = p.name || "Someone"); } catch { }
+      renderNotes(); renderRail(); if (STEPS[S.step].id === "audit") render();
+    }, () => { });
+    renderNotes(); renderRail();
+  } catch { /* stays local */ }
+}
+function summaryMarkdown() {
+  const lines = ["# ABA Phase 1 walkthrough sign-off", "", `Reviewer: ${SO.names[SO.me] || "(this browser)"} · ${fmtStamp(Date.now())}`, "", "| # | Step | Verdict | Note | All reviewers |", "|---|---|---|---|---|"];
+  STEPS.forEach((s, i) => { const m = SO.mine[s.id]; lines.push(`| ${i + 1} | ${s.title} | ${m ? m.v : "—"} | ${(m?.note || "").replace(/\|/g, "/").replace(/\n/g, " ")} | ${aggregate(s.id) || "—"} |`); });
+  return lines.join("\n");
+}
+
+/* ============================================================
+   Rendering
+   ============================================================ */
+function renderRail() {
+  let html = "", lastAct = "";
+  STEPS.forEach((s, i) => { if (s.act !== lastAct) { html += `<div class="act">${esc(s.act)}</div>`; lastAct = s.act; }
+    const m = SO.mine[s.id]; html += `<button class="${i === S.step ? "cur" : ""}" data-act="goto" data-arg="${i}"><span class="n">${i + 1}</span><span>${esc(s.title)}</span><span class="v">${m ? { pass: "✓", concern: "◐", fail: "✗" }[m.v] : ""}</span></button>`; });
+  $("#rail").innerHTML = html;
+  $("#step-select").innerHTML = STEPS.map((s, i) => `<option value="${i}" ${i === S.step ? "selected" : ""}>${i + 1}. ${esc(s.title)}${SO.mine[s.id] ? " · " + SO.mine[s.id].v : ""}</option>`).join("");
+}
+function renderNotes() {
+  const s = STEPS[S.step]; const m = SO.mine[s.id];
+  $("#verify-sheet").innerHTML = `<h3>What to verify</h3><ul class="checks">${s.verify.map((v, i) => `<li><input type="checkbox" id="vc-${s.id}-${i}" ${S.ui["vc-" + s.id + "-" + i] ? "checked" : ""} data-uicheck="vc-${s.id}-${i}"><label for="vc-${s.id}-${i}">${esc(v)}</label></li>`).join("")}</ul>
+    ${s.decisions.length ? `<div style="margin-top:12px">${s.decisions.map(([id, t]) => `<div class="dec"><b>${id}</b> Decision needed: ${esc(t)}</div>`).join("")}</div>` : ""}
+    <p class="spec" style="margin:10px 0 0">Spec: ${esc(s.spec)}</p>`;
+  const others = Object.entries(SO.all).filter(([id, d]) => id !== SO.me && d?.steps?.[s.id]);
+  $("#signoff-sheet").innerHTML = `<h3>Your sign-off</h3><div class="verdicts">${["pass", "concern", "fail"].map(v => `<button class="${v} ${m?.v === v ? "on" : ""}" data-act="verdict" data-arg="${v}">${v === "pass" ? "✓ Pass" : v === "concern" ? "◐ Concern" : "✗ Fail"}</button>`).join("")}</div>
+    <div class="field" style="margin-top:8px"><label for="so-note">Note${m && m.v !== "pass" ? " (please say what's wrong)" : ""}</label><textarea id="so-note" rows="2" placeholder="What should change?">${esc(m?.note || "")}</textarea></div>
+    <div class="row" style="margin-top:6px"><button class="btn sm" data-act="saveNote">Save note</button><span class="tiny muted">${SO.mode === "shared" ? "Shared with everyone reviewing this page." : "Saved in this browser only. Copy the summary in step 20."}</span></div>
+    ${others.length ? `<div class="others"><b class="tiny">Other reviewers</b>${others.map(([id, d]) => `<div>${verdictPill(d.steps[s.id].v)} <b>${esc(SO.names[id] || "Someone")}</b>${d.steps[s.id].note ? `: ${esc(d.steps[s.id].note)}` : ""}</div>`).join("")}</div>` : ""}`;
+  renderDB();
+}
+function renderDB() {
+  const flash = Date.now() - 2500;
+  $("#db-sheet").innerHTML = `<h3>Live database <span class="pill neutral mono" style="text-transform:none;letter-spacing:0">aba_${S.env}</span></h3><p class="tiny muted" style="margin:0 0 6px">Row counts read from the in-browser stand-in for PostgreSQL. A green number shows rows added since this step began.</p>
+  <table class="t"><tr><th>Table</th><th class="num">Rows</th><th class="num">This step</th></tr>${TABLES.map(t => { const dlt = count(t) - (stepBaseline[t] ?? count(t)); return `<tr class="${(lastTouched[t] || 0) > flash ? "flash" : ""}"><td class="mono">${t}</td><td class="num">${count(t).toLocaleString()}</td><td class="num">${dlt ? `<span class="delta">${dlt > 0 ? "+" : ""}${dlt}</span>` : ""}</td></tr>`; }).join("")}</table>`;
+}
+function render() {
+  const s = STEPS[S.step];
+  $("#st-eyebrow").textContent = `Step ${S.step + 1} of ${STEPS.length} · ${s.act}`;
+  $("#st-title").textContent = s.title; $("#st-lede").textContent = s.lede;
+  $("#stage").innerHTML = s.render();
+  $("#prog-label").textContent = `${S.step + 1} / ${STEPS.length}`; $("#prog-bar").style.width = `${(S.step + 1) / STEPS.length * 100}%`;
+  $("#prev-btn").disabled = S.step === 0; $("#next-btn").disabled = S.step === STEPS.length - 1;
+  $("#next-btn").textContent = S.step === STEPS.length - 1 ? "End of walkthrough" : `Next: ${STEPS[S.step + 1].title} →`;
+  renderRail(); renderNotes();
+}
+function go(i) {
+  if (i < 0 || i >= STEPS.length) return;
+  S.step = i; stepBaseline = snapCounts(); const st = STEPS[i]; if (st.enter) st.enter(); render();
+  $("#stage-col").scrollIntoView({ block: "start", behavior: "smooth" });
+}
+
+/* event delegation */
+document.addEventListener("click", (e) => {
+  const el = e.target.closest("[data-act]"); if (!el || el.disabled) return;
+  const fn = A[el.dataset.act]; if (!fn) return;
+  e.preventDefault();
+  const out = fn(el.dataset.arg);
+  if (out !== false && !["next", "prev", "goto"].includes(el.dataset.act)) render();
+});
+document.addEventListener("input", (e) => {
+  const el = e.target;
+  if (el.dataset.form && el.tagName !== "SELECT") { const f = S.forms[el.dataset.form]; if (!f) return; if (!el._snap) { el._snap = true; f.undo.push(structuredClone(f.vals)); if (f.undo.length > 50) f.undo.shift(); f.redo = []; } f.vals[el.dataset.field] = el.value; softRefresh(el); }
+  if (el.dataset.ui) { S.ui[el.dataset.ui] = el.value; }
+});
+document.addEventListener("change", (e) => {
+  const el = e.target;
+  if (el.dataset.form) { el._snap = false; if (el.tagName === "SELECT" && S.forms[el.dataset.form]) { formCommit(el.dataset.form, el.dataset.field, el.value); render(); } }
+  if (el.dataset.ui) { S.ui[el.dataset.ui] = el.value; if (el.dataset.ui === "gStudent") S.ui.gProg = DB.programs.find(p => p.student_id === el.value).id; if (["gStudent", "gProg"].includes(el.dataset.ui)) { S.ui.gBar = undefined; S.ui.phBefore = undefined; } render(); }
+  if (el.dataset.uicheck) S.ui[el.dataset.uicheck] = el.checked;
+  if (el.id === "step-select") go(+el.value);
+});
+function refocus(id) { if (!id) return; const n = document.getElementById(id); if (n && n.tagName !== "SELECT") { n.focus(); try { const L = n.value.length; n.setSelectionRange(L, L); } catch { } } }
+/* live-update derived bits while typing, without losing focus */
+let softT; function softRefresh(el) { clearTimeout(softT); softT = setTimeout(() => { const id = el.id; const pos = el.selectionStart; render(); const n = document.getElementById(id); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch { } n._snap = true; } }, 350); }
+document.addEventListener("keydown", (e) => {
+  const el = e.target; const key = el?.dataset?.form; if (!key || !(e.ctrlKey || e.metaKey) || e.key.toLowerCase() !== "z" && e.key.toLowerCase() !== "y") return;
+  e.preventDefault(); el._snap = false; const id = el.id;
+  if (e.key.toLowerCase() === "y" || e.shiftKey) A.formRedo(key); else A.formUndo(key);
+  render(); refocus(id);
+});
+/* clocks */
+setInterval(() => {
+  document.querySelectorAll("[data-clock]").forEach(n => n.textContent = n.hasAttribute("data-full") ? fmtStamp(Date.now()) : fmtTime(Date.now()));
+  document.querySelectorAll("[data-since]").forEach(n => n.textContent = "⏱ " + mmss((Date.now() - +n.dataset.since) / 1000));
+  document.querySelectorAll("[data-run]").forEach(n => n.textContent = mmss((Date.now() - +n.dataset.run) / 1000));
+}, 1000);
+
+function boot() {
+  S = freshState(); seed(); baseline = snapCounts(); stepBaseline = snapCounts(); lastTouched = {};
+  S.step = 0; if (STEPS[0].enter) STEPS[0].enter(); render();
+}
+boot();
+initShared();
+</script>
