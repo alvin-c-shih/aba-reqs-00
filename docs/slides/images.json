@@ -1,0 +1,437 @@
+{
+ "abc-patterns": [
+  {
+   "blob": "6be7429cb993882c21db0d21b6765afa",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "ABC program page with a graph of incidents and bars for the most common antecedents and consequences"
+  }
+ ],
+ "arch-containers": [
+  {
+   "blob": "90c6f1ab7dd736fecbbd80e97275e0f7",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Container diagram: browser app with shell, role areas, design system and local store; API routers; four environment databases"
+  }
+ ],
+ "arch-data": [
+  {
+   "blob": "9a7f4dd612a9d79d55a3d2434fbb1236",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Data model in four groups: platform and people, clinical design, collection, and accountability"
+  }
+ ],
+ "arch-deploy": [
+  {
+   "blob": "662c1ac1979a12aec7cf9d047b8d7c80",
+   "source": "diagram 13-deployment-proposed",
+   "alt": "Proposed deployment diagram: devices over HTTPS to a reverse proxy, API, PostgreSQL, secrets, optional local models, backups and monitoring, with decisions needed and what already exists"
+  }
+ ],
+ "arch-facts": [
+  {
+   "blob": "229d2cf6f3a5d9ac1fc43098496987ce",
+   "source": "diagram 8-derived-facts",
+   "alt": "Derived facts diagram: observations to series, status flag and suggestions; program_facts feeding progress report, local-model draft, family summary and the family portal; service log from sessions"
+  }
+ ],
+ "arch-map": [
+  {
+   "blob": "4c947074538b1bdf8e8fdc8b8b3923fd",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Responsibility map: design system, shell, platform, school, clinical, collection and family, each with its web folder, API router, data and role"
+  }
+ ],
+ "arch-media": [
+  {
+   "blob": "4fd1d8b4da4ef007ce1e9ff30e227c44",
+   "source": "diagram 11-consent-media",
+   "alt": "Consent and media diagram: six upload checks with refusals, consent record and revoke, view and remove, and known gaps"
+  }
+ ],
+ "arch-models": [
+  {
+   "blob": "3fd4202c9df306162326b5363e4966f3",
+   "source": "diagram 7-local-models",
+   "alt": "Local models diagram: three uses pass through six gates in the API to Ollama with mistral-nemo 12b and a whisper.cpp server with Whisper small.en; outputs are drafts; other hosts are refused"
+  }
+ ],
+ "arch-notify": [
+  {
+   "blob": "bcce8bed066fdf942935eacf17756c00",
+   "source": "diagram 12-notifications",
+   "alt": "Notifications diagram: five events and their recipients flow through one function into a table read by the bell in the app"
+  }
+ ],
+ "arch-runtime": [
+  {
+   "blob": "97733c750789437bef2fae0b37456090",
+   "source": "diagram 9-runtime",
+   "alt": "Runtime diagram: browser, Vite dev server, API, PostgreSQL, optional Ollama and whisper-server, with configuration, state on disk, commands and environment gates"
+  }
+ ],
+ "arch-security": [
+  {
+   "blob": "7f67b5e51e1a14ae059a3ed0889b7b8e",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Security layers diagram with environment gates and a list of items still required before real data"
+  }
+ ],
+ "arch-signin": [
+  {
+   "blob": "44b899a40287409c9e2f20916fad67d5",
+   "source": "diagram 10-sign-in",
+   "alt": "Sign-in diagram: six-step chain with the refusal at each step, two-factor enrolment steps, and known gaps"
+  }
+ ],
+ "arch-sync": [
+  {
+   "blob": "a265e307b7fa654fab3e2ef593a29ab7",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Sequence diagram of lock, offline recording, takeover, heartbeat and the review queue"
+  }
+ ],
+ "bcba-annotate": [
+  {
+   "blob": "e97ce2d19a288934f9dc6076af1e5836",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Inline note composer under the graph with note, treatment change and context options"
+  }
+ ],
+ "bcba-bar": [
+  {
+   "blob": "c393cdd1e6aaf44d7557378c54467b63",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Bar chart of elopement counts per session falling after an intervention phase"
+  }
+ ],
+ "bcba-caseload": [
+  {
+   "blob": "b356ff66c96f89d1cc82219f39f59e78",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Caseload: five students, each program with a sparkline, latest value, status badge and suggestion badges"
+  }
+ ],
+ "bcba-correct": [
+  {
+   "blob": "4caf08affa542ed79dd9c54611cad773",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Session detail drawer listing each trial, with a correction form asking for a reason"
+  }
+ ],
+ "bcba-form": [
+  {
+   "blob": "fb04b06ea372f0353caf8ba0f933fc43",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Edit program dialog with undo and redo buttons, a mastery rule sentence and target chips"
+  }
+ ],
+ "bcba-graph": [
+  {
+   "blob": "cccde5b298ebae87b049c2611f2b9a6f",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Line graph with three phases, a criterion line at 80 percent, a trend line and a tooltip for one session"
+  }
+ ],
+ "bcba-phase": [
+  {
+   "blob": "8769b72cc3e8dace62e67613acfcf7ec",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Graph with a fourth phase added, the phases and notes timeline below, and an undo message"
+  }
+ ],
+ "bcba-review": [
+  {
+   "blob": "255d32378197aaf068295723d73f6ba9",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Review queue with two waiting sessions, each showing why it was queued and accept or exclude buttons"
+  }
+ ],
+ "bcba-team": [
+  {
+   "blob": "60f2ca836da8fcbd1298c262a41b4f2d",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Student page with the assigned team, programs, messages, family contacts and consent"
+  }
+ ],
+ "family-home": [
+  {
+   "blob": "28e8cd4a321f7cab05bed1eac58f0245",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Parent counting a behaviour at home with plus and minus buttons and a note"
+  },
+  {
+   "blob": "ffc12a22d7c7de341839aa48667e7540",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "BCBA review queue showing home data entered by a parent"
+  }
+ ],
+ "family-parent": [
+  {
+   "blob": "34cc6d7dc4a6456f680959802002cd6a",
+   "source": "69-parent-child",
+   "alt": "Parent view of one child: a published progress summary and a list of goals with plain-language status"
+  }
+ ],
+ "family-teacher": [
+  {
+   "blob": "6db32f43643dca9d50ec9bb6bdc85935",
+   "source": "72-teacher-student",
+   "alt": "Teacher view of a student with goals, support text and a notes thread"
+  },
+  {
+   "blob": "3b299b9b6e4e73383b670e5262331341",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "BCBA student page showing the family message thread, contacts and consent"
+  }
+ ],
+ "graph-views": [
+  {
+   "blob": "b8bab443e5dff57fae763e9c3b5c4f84",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Cumulative record of incidents rising steadily"
+  },
+  {
+   "blob": "657675f162cc61b0e53cd53dc7ecde1e",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Data table of sessions with phase, value, detail and recorder"
+  }
+ ],
+ "insight-change": [
+  {
+   "blob": "8e939d548be38a8f9c788c316ddffe41",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Program page with a suggestions card, a suggested change point on the graph and a forecast line"
+  }
+ ],
+ "insight-more": [
+  {
+   "blob": "d657e1f2d771a15d997bb5103db2b5b3",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Aggression graph with one session ringed as unusual"
+  },
+  {
+   "blob": "eb286c85df7134d173c595eab6af204b",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Hand washing program flagged as prompt-dependent, with the reason"
+  }
+ ],
+ "learn-demo": [
+  {
+   "blob": "d02c41b45af1a20c8595894d3bd32c0c",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Sign-in page in the demo environment with seven persona cards beside the normal sign-in form"
+  }
+ ],
+ "learn-design": [
+  {
+   "blob": "a6e6a2ec469af2ca6b6d6a44163ea0b3",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Design system reference page with colour tokens and the four environment banners"
+  },
+  {
+   "blob": "4ee612c6e6238ab320e0c549e17e08f4",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Program graph in dark theme showing a regression after a phase change"
+  }
+ ],
+ "learn-palette": [
+  {
+   "blob": "3393b34ce1f6712f561773d8e393266f",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Command palette filtered by the word dee, listing a student and her two graphs"
+  }
+ ],
+ "learn-tour": [
+  {
+   "blob": "b16536fb298b7219b49ebae5c88a010c",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Guided tour spotlighting the attention chips on the caseload, with a card explaining them"
+  }
+ ],
+ "local-ai": [
+  {
+   "blob": "b943d45d9d3da5c167e9fefab738c149",
+   "source": "60-family-summary-ai-draft",
+   "alt": "Family summary editor with a draft written by a local model, labelled with the model name"
+  },
+  {
+   "blob": "fed1b415b034b0cffc43c4ad49a1bd5d",
+   "source": "62-ask-caseload",
+   "alt": "Ask about your caseload dialog with an answer from the local model"
+  }
+ ],
+ "rbt-lock": [
+  {
+   "blob": "48ed3bc76bfdf0b75168c625270f92c0",
+   "source": "30-rbt-lock-conflict",
+   "alt": "Jo's device: Marcus Rivera is recording Ben, with a take over option and a warning"
+  },
+  {
+   "blob": "487f73197fa50ed5790b57fc7744c366",
+   "source": "31-rbt-lock-lost",
+   "alt": "Marcus's device: banner saying Jo Chen took over this session"
+  },
+  {
+   "blob": "4b1943dfa7ce979f92454cb12053e981",
+   "source": "32-rbt-end",
+   "alt": "End session dialog with per-program totals and a session note"
+  }
+ ],
+ "rbt-methods": [
+  {
+   "blob": "32e4b217ed5ce538092b8ddeea3fcb9e",
+   "source": "64-rbt-abc",
+   "alt": "ABC recorder with antecedent and consequence choices"
+  },
+  {
+   "blob": "2f2b32a8b040b27dd05cd9d606676d12",
+   "source": "65-rbt-interval",
+   "alt": "Interval recorder with a 30-second countdown and yes or no buttons"
+  },
+  {
+   "blob": "1af66347cd0cdeaff24040c08c78feed",
+   "source": "66-rbt-task-analysis",
+   "alt": "Task analysis recorder listing eight tooth-brushing steps with outcomes"
+  }
+ ],
+ "rbt-offline": [
+  {
+   "blob": "48af2e840e206d836a414f28f2d2dc09",
+   "source": "27-rbt-offline",
+   "alt": "Recording while offline; the status pill reads offline with three items saved on the device"
+  },
+  {
+   "blob": "51f87e411e4641674206474f33a5d541",
+   "source": "28-rbt-sync-offline",
+   "alt": "Sync status dialog while offline, showing items waiting on the device"
+  },
+  {
+   "blob": "a24b0d79261bb0ba52ec81218f1018fc",
+   "source": "29-rbt-sync-receipt",
+   "alt": "Sync status dialog back online: server confirmed 16 of 16"
+  }
+ ],
+ "rbt-record": [
+  {
+   "blob": "41d2fcf58cf8310d726fb3080aebc48c",
+   "source": "24-rbt-trials",
+   "alt": "Trial recording with four outcome buttons and a running tape of results"
+  },
+  {
+   "blob": "b9fd5b123f8e7a28107df1e3efa66ccf",
+   "source": "26-rbt-frequency",
+   "alt": "Frequency recording with a large count and a plus-one button"
+  },
+  {
+   "blob": "a744002c5ad5bbfb32fd1c20dfce89af",
+   "source": "25-rbt-undo",
+   "alt": "Trial screen after undoing the last entry, with a confirmation message"
+  }
+ ],
+ "rbt-today": [
+  {
+   "blob": "feb5582281a6d80b32de0c04a1a39318",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Today list with five assigned students"
+  },
+  {
+   "blob": "c4df9f36e1dd9e252d42fa67a86b1592",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Guided tour highlighting the sync status pill"
+  },
+  {
+   "blob": "b7854077acbecbf05ffdd49663cd1068",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Start session screen with session type and setting"
+  }
+ ],
+ "rbt-voice": [
+  {
+   "blob": "438526a45bccaca9dae817f15713f119",
+   "source": "voice-note",
+   "alt": "End session dialog on a phone with a dictated note in the text box and a Dictate button below it"
+  }
+ ],
+ "report": [
+  {
+   "blob": "5d6e680c084e3de1c19d32b449a54717",
+   "source": "59-progress-report",
+   "alt": "Progress report for one student with sessions, hours and a section per program"
+  }
+ ],
+ "roles": [
+  {
+   "blob": "f5b26518c64eb533e9328fbe4f9b8a83",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Context diagram: RBT, BCBA, parent, teacher, school admin and system admin use one web app backed by an API and PostgreSQL, with optional local models"
+  }
+ ],
+ "school-extras": [
+  {
+   "blob": "0ba291abd8fd142d75e5a73703d0b8be",
+   "source": "74-school-features",
+   "alt": "Optional features card with switches for local-model drafts and voice notes"
+  },
+  {
+   "blob": "ca0eba7159ea7da9642bcb6cba4068cf",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Import students dialog reporting rows ready, already enrolled and to fix"
+  }
+ ],
+ "school-overview": [
+  {
+   "blob": "b3641f2e5e36d1d1a50b29390beeda60",
+   "source": "35-school-overview",
+   "alt": "School overview with two site cards, East Harlem and Bronx, and a note about what admins can see"
+  }
+ ],
+ "school-people": [
+  {
+   "blob": "93ea392185a96d10681fae969a6b0a1a",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Temporary password dialog over the people list"
+  }
+ ],
+ "school-students": [
+  {
+   "blob": "a49e810f2d70ee101ce844c1ec1dad9b",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Students table with site, supervising BCBA, assigned RBTs and status for each student"
+  }
+ ],
+ "service-log": [
+  {
+   "blob": "7321b37e972b47ea81ce7ef0f06c506e",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Service log table with date, student, staff, service, minutes and units, and totals above"
+  }
+ ],
+ "system-audit": [
+  {
+   "blob": "44ebea53748fcbcfd7b01e7de3b62729",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Audit log table with time, person, action, school and details"
+  }
+ ],
+ "system-health": [
+  {
+   "blob": "8784a47a0b974eee2a2a4533a9f42498",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Platform health: environment, database name, total rows, canary result and a table of row counts"
+  }
+ ],
+ "system-schools": [
+  {
+   "blob": "77e8d8915c87c16203a5f95430796145",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Schools page with two school cards showing sites, active accounts and admins"
+  }
+ ],
+ "two-factor": [
+  {
+   "blob": "4e32b28a75ec89673bc5695b366080ce",
+   "source": "unrecorded (uploaded before 2026-11-11 evening; see alt)",
+   "alt": "Sign-in security dialog showing an authenticator setup key and a field for the 6-digit code"
+  }
+ ]
+}

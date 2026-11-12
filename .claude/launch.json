@@ -1,0 +1,8 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "api", "runtimeExecutable": "uv", "runtimeArgs": ["run", "--project", "apps/api", "uvicorn", "--app-dir", "apps/api", "aba.main:app", "--port", "8010", "--reload", "--reload-dir", "apps/api/aba"], "port": 8010, "autoPort": false },
+    { "name": "web", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev:web"], "port": 5173 },
+    { "name": "speech", "runtimeExecutable": "whisper-server", "runtimeArgs": ["-m", "data/models/whisper/ggml-small.en.bin", "--host", "127.0.0.1", "--port", "8178", "--inference-path", "/v1/audio/transcriptions", "--convert", "--tmp-dir", "data/tmp"], "port": 8178, "autoPort": false }
+  ]
+}

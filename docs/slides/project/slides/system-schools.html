@@ -1,0 +1,10 @@
+<section id="system-schools" data-transition="fade" style="background:#f6f5f1;color:#1b1f23;font-family:'Inter', Arial, sans-serif;padding:96px;display:flex;flex-direction:row;gap:64px;align-items:center">
+<div style="width:520px;display:flex;flex-direction:column;gap:28px">
+<p style="font-size:24px;font-weight:600;color:#6b46b0;letter-spacing:2px;text-transform:uppercase">System admin</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:600;line-height:1.08">Schools are isolated tenants</h2>
+<p style="font-size:30px;line-height:1.4;color:#454c54">Create a school with its first admin, or suspend one.</p>
+<p style="font-size:30px;line-height:1.4;color:#454c54">The system admin runs the platform and cannot open a student record.</p>
+</div>
+<img src="/_blob/77e8d8915c87c16203a5f95430796145" alt="Schools page with two school cards showing sites, active accounts and admins" style="width:1144px;height:779px;object-fit:contain;border-radius:16px;border:1px solid #d9d5cb">
+<aside>Isolation is enforced inside the database with row-level security, not only by the screens: a query with no filter still returns one school's rows, and for a system admin the students table returns nothing. A test asserts exactly that.</aside>
+</section>

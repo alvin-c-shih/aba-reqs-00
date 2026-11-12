@@ -1,0 +1,112 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-11T22:40:00Z"
+  },
+  "lists": "css",
+  "title": "ABA System Walkthrough",
+  "cover": "cover",
+  "order": [
+    "cover",
+    "rework",
+    "roles",
+    "rbt-today",
+    "rbt-record",
+    "rbt-offline",
+    "rbt-lock",
+    "rbt-methods",
+    "rbt-voice",
+    "bcba-caseload",
+    "bcba-graph",
+    "bcba-annotate",
+    "bcba-phase",
+    "bcba-bar",
+    "insight-change",
+    "insight-more",
+    "abc-patterns",
+    "graph-views",
+    "bcba-correct",
+    "bcba-form",
+    "bcba-team",
+    "bcba-review",
+    "report",
+    "service-log",
+    "family-parent",
+    "family-home",
+    "family-teacher",
+    "local-ai",
+    "school-overview",
+    "school-people",
+    "school-students",
+    "school-extras",
+    "system-schools",
+    "system-health",
+    "system-audit",
+    "two-factor",
+    "learn-tour",
+    "learn-palette",
+    "learn-demo",
+    "learn-design",
+    "arch-containers",
+    "arch-runtime",
+    "arch-map",
+    "arch-data",
+    "arch-facts",
+    "arch-sync",
+    "arch-security",
+    "arch-models",
+    "arch-signin",
+    "arch-media",
+    "arch-notify",
+    "arch-deploy",
+    "decisions",
+    "assumptions",
+    "run-it"
+  ],
+  "sections": {
+    "intro": {
+      "description": "What was rebuilt and who uses it.",
+      "start": "cover"
+    },
+    "rbt": {
+      "description": "The RBT records sessions on a phone, online or offline.",
+      "start": "rbt-today"
+    },
+    "bcba": {
+      "description": "The BCBA reads graphs, acts on suggestions, annotates, reports and decides what changes.",
+      "start": "bcba-caseload"
+    },
+    "family": {
+      "description": "Parents and teachers see what the team shares; local models draft on the school’s own machine.",
+      "start": "family-parent"
+    },
+    "school": {
+      "description": "The school admin manages sites, people and enrolment.",
+      "start": "school-overview"
+    },
+    "system": {
+      "description": "The system admin runs the platform across schools.",
+      "start": "system-schools"
+    },
+    "learn": {
+      "description": "How the app teaches itself and resets for demos.",
+      "start": "learn-tour"
+    },
+    "architecture": {
+      "description": "System design from containers to security, decisions and open items.",
+      "start": "arch-containers"
+    }
+  },
+  "faces": {
+    "inter": {
+      "family": "Inter",
+      "href": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Inter:wght@400;600&display=swap"
+    },
+    "space-grotesk": {
+      "family": "Space Grotesk",
+      "href": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Inter:wght@400;600&display=swap"
+    }
+  },
+  "designSystems": []
+}

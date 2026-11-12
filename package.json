@@ -1,0 +1,11 @@
+{
+  "name": "aba",
+  "private": true,
+  "version": "2.0.0",
+  "workspaces": ["apps/web", "packages/*"],
+  "scripts": {
+    "dev:web": "npm run dev -w @aba/web",
+    "build": "npm run build -w @aba/web",
+    "typecheck": "npm run typecheck -w @aba/web"
+  }
+}

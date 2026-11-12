@@ -1,0 +1,24 @@
+<section id="assumptions" data-transition="fade" style="background:#f6f5f1;color:#1b1f23;font-family:'Inter', Arial, sans-serif;padding:96px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:24px;font-weight:600;color:#b3312b;letter-spacing:2px;text-transform:uppercase">Open items</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:600;line-height:1.08">What still needs a human answer</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#ffffff;padding:36px;border:1px solid #d9d5cb;border-radius:20px">
+<h3 style="font-size:34px;font-weight:600">Before a pilot</h3>
+<p style="font-size:28px;line-height:1.4;color:#454c54">Counsel: does HIPAA or FERPA govern this data?</p>
+<p style="font-size:28px;line-height:1.4;color:#454c54">A BCBA reviews the status and suggestion thresholds.</p>
+<p style="font-size:28px;line-height:1.4;color:#454c54">Deployment adds TLS, disk encryption and backups.</p>
+<p style="font-size:28px;line-height:1.4;color:#454c54">Enforce two-factor sign-in; set audit retention.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#ffffff;padding:36px;border:1px solid #d9d5cb;border-radius:20px">
+<h3 style="font-size:34px;font-weight:600">Not verified yet</h3>
+<p style="font-size:28px;line-height:1.4;color:#454c54">Browsers other than Chromium.</p>
+<p style="font-size:28px;line-height:1.4;color:#454c54">Screen-reader use (keyboard and labels are in place).</p>
+<p style="font-size:28px;line-height:1.4;color:#454c54">Load at 100 students and two years of data.</p>
+<p style="font-size:28px;line-height:1.4;color:#454c54">Voice notes with a real voice, classroom noise or a phone.</p>
+</div>
+</div>
+<p style="font-size:26px;line-height:1.4;color:#454c54">Closed since the first version: automated change-point detection, which the original requirements asked for and Phase 1 lacked. Phases 2 to 4 are first working versions without user testing. Assumptions are logged with a confidence level in docs/ASSUMPTIONS.md, and every known gap is listed by severity in docs/GAPS.md.</p>
+<aside>Not built: voice commands, in-app video recording, push, email and SMS, celeration charts, payer-specific billing, inter-observer agreement, an integration API. Also unverified: installed-app offline start, since the walkthrough simulates offline. Voice notes now run on a local Whisper model for the session-end note; the test used synthetic speech.</aside>
+</section>

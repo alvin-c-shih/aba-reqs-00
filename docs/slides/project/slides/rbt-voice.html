@@ -1,0 +1,11 @@
+<section id="rbt-voice" data-transition="fade" style="background:#f6f5f1;color:#1b1f23;font-family:'Inter', Arial, sans-serif;padding:96px;display:flex;flex-direction:row;gap:96px;align-items:center">
+<div style="width:900px;display:flex;flex-direction:column;gap:28px">
+<p style="font-size:24px;font-weight:600;color:#1d7a4b;letter-spacing:2px;text-transform:uppercase">RBT · prototype</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:600;line-height:1.08">Dictate the session note</h2>
+<p style="font-size:30px;line-height:1.4;color:#454c54">Tap Dictate, speak, tap Stop. The text lands in the note about a second later.</p>
+<p style="font-size:30px;line-height:1.4;color:#454c54">A Whisper model on the school’s own machine does the transcription. The audio is not kept.</p>
+<p style="font-size:26px;line-height:1.4;color:#96590a">Tested with synthetic speech only, not a real voice, a noisy classroom or a phone.</p>
+</div>
+<img src="/_blob/438526a45bccaca9dae817f15713f119" alt="End session dialog on a phone with a dictated note in the text box and a Dictate button below it" style="width:430px;height:880px;object-fit:contain;border-radius:20px;border:1px solid #d9d5cb">
+<aside>The button appears only when the school has switched voice notes on and the server has a local speech model. It works online only, in English, and only on the session-end note for now. Model: Whisper small.en through a whisper.cpp server.</aside>
+</section>
