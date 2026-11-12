@@ -101,6 +101,6 @@ Fixed on 2026-11-11 and removed from this list: family goals did not say which d
 | Gap | Note |
 |---|---|
 | Most slide images have no recorded source | `docs/slides/images.json` now maps each slide image to its screenshot or diagram, but only for the 27 uploaded since 2026-11-11 evening; the other 40 are identified by their description only. |
-| Nothing is committed | All work since the initial commit is uncommitted on `rework/v2`, at the owner's request. |
+| The work is committed locally but not pushed or reviewed | One large commit on `rework/v2`; no pull request yet. |
 | Superseded images remain in the slide deck's asset store | About two dozen older diagram and screenshot uploads are no longer referenced by any slide. |
 | Three views have no ADR of their own | Notifications, the runtime layout and the proposed deployment are documented in the architecture guide only. |
